@@ -14,6 +14,7 @@
 // ════════════════════════════════════════════════════════════
 //  🔑  CREDENTIALS — ONLY CHANGE THESE TWO LINES
 // ════════════════════════════════════════════════════════════
+// config.js ফাইলের ১৭ ও ১৮ নম্বর লাইন
 const SUPABASE_URL = 'https://mktdbwokfonynfmpsqcx.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1rdGRid29rZm9ueW5mbXBzcWN4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0OTA4OTEsImV4cCI6MjA5MTA2Njg5MX0.J-75lBzdoxIfQaR386M_nhY7i6r69VQnXFT3AFEMH0o';
 
