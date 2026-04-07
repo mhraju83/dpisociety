@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Join DPI Society — Register</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<!-- ✅ SUPABASE SDK -->
+<script src="config.js"></script>
+<style>
+  :root {
+    --green:#006A4E; --green-light:#00875F; --green-pale:#E8F5F0; --green-mid:#00A36C;
+    --red:#C8102E; --gold:#F4A600; --dark:#0D1A13;
+    --text:#1A2E22; --text-muted:#5A7A68;
+    --border:rgba(0,106,78,0.15); --white:#FFFFFF; --off-white:#F7FAF8;
+    --error:#D93025; --success:#1E8C5A;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--off-white);color:var(--text);min-height:100vh;}
+  .page-wrap{display:grid;grid-template-columns:420px 1fr;min-height:100vh;}
+
+  /* LEFT */
+  .left-panel{background:var(--dark);position:sticky;top:0;height:100vh;display:flex;flex-direction:column;justify-content:space-between;padding:40px;overflow:hidden;}
+  .left-bg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 80% 60% at 0% 100%,rgba(0,106,78,0.45) 0%,transparent 65%),radial-gradient(ellipse 60% 50% at 100% 0%,rgba(200,16,46,0.15) 0%,transparent 60%);}
+  .left-pattern{position:absolute;inset:0;opacity:0.03;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,1) 0px,rgba(255,255,255,1) 1px,transparent 1px,transparent 40px),repeating-linear-gradient(-45deg,rgba(255,255,255,1) 0px,rgba(255,255,255,1) 1px,transparent 1px,transparent 40px);}
+  .left-top{position:relative;z-index:2;}
+  .brand-link{text-decoration:none;display:flex;align-items:center;gap:10px;margin-bottom:60px;}
+  .brand-logo{width:40px;height:40px;border-radius:10px;background:var(--green);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:16px;font-weight:900;color:white;}
+  .brand-name{font-size:15px;font-weight:600;color:white;}
+  .left-headline{font-family:'Playfair Display',serif;font-size:36px;font-weight:900;color:white;line-height:1.15;margin-bottom:16px;}
+  .left-headline .accent{color:var(--gold);}
+  .left-sub{font-size:14px;color:rgba(255,255,255,0.55);line-height:1.7;margin-bottom:40px;}
+  .benefit-list{display:flex;flex-direction:column;gap:14px;}
+  .benefit-item{display:flex;align-items:flex-start;gap:12px;}
+  .benefit-dot{width:22px;height:22px;border-radius:50%;background:rgba(0,106,78,0.4);border:1px solid rgba(0,163,108,0.5);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+  .benefit-dot svg{width:10px;height:10px;}
+  .benefit-text{font-size:13px;color:rgba(255,255,255,0.65);line-height:1.5;}
+  .left-bottom{position:relative;z-index:2;}
+  .left-stats{display:flex;gap:24px;padding-top:32px;border-top:1px solid rgba(255,255,255,0.08);}
+  .ls-num{font-family:'Playfair Display',serif;font-size:24px;font-weight:900;color:white;}
+  .ls-label{font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;}
+
+  /* RIGHT */
+  .right-panel{padding:48px 56px;display:flex;flex-direction:column;justify-content:center;max-width:700px;}
+  .form-header{margin-bottom:32px;}
+  .form-step-indicator{display:flex;align-items:center;gap:8px;margin-bottom:20px;}
+  .step-pill{height:4px;border-radius:4px;transition:all 0.3s;}
+  .step-pill.active{width:32px;background:var(--green);}
+  .step-pill.done{width:20px;background:var(--green);opacity:0.4;}
+  .step-pill.inactive{width:20px;background:var(--border);}
+  .step-label{font-size:12px;color:var(--text-muted);margin-left:4px;}
+  .form-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:var(--dark);margin-bottom:6px;}
+  .form-subtitle{font-size:14px;color:var(--text-muted);}
+  .form-subtitle a{color:var(--green);text-decoration:none;font-weight:500;}
+
+  .form-step{display:none;}
+  .form-step.active{display:block;animation:slideIn 0.3s ease;}
+  @keyframes slideIn{from{opacity:0;transform:translateX(12px);}to{opacity:1;transform:translateX(0);}}
+
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+  .form-row.single{grid-template-columns:1fr;}
+  .field{display:flex;flex-direction:column;gap:6px;}
+  .field label{font-size:12px;font-weight:600;color:var(--text);letter-spacing:0.03em;text-transform:uppercase;}
+  .field label span{color:var(--red);margin-left:2px;}
+  .field input,.field select,.field textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:white;transition:all 0.2s;outline:none;appearance:none;}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(0,106,78,0.08);}
+  .field input.error,.field select.error{border-color:var(--error);}
+  .field .field-hint{font-size:11px;color:var(--text-muted);}
+  .field .field-error{font-size:11px;color:var(--error);display:none;}
+  .field input.error + .field-error{display:block;}
+
+  /* Password strength */
+  .pw-strength{margin-top:6px;}
+  .pw-bars{display:flex;gap:4px;margin-bottom:4px;}
+  .pw-bar{height:3px;flex:1;border-radius:3px;background:var(--border);transition:background 0.3s;}
+  .pw-bar.weak{background:#E24B4A;} .pw-bar.fair{background:var(--gold);} .pw-bar.strong{background:var(--success);}
+  .pw-label{font-size:11px;color:var(--text-muted);}
+
+  /* User type */
+  .user-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .user-type-card{border:2px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:all 0.2s;position:relative;}
+  .user-type-card:hover{border-color:rgba(0,106,78,0.4);background:var(--green-pale);}
+  .user-type-card.selected{border-color:var(--green);background:var(--green-pale);}
+  .user-type-card input[type="radio"]{position:absolute;opacity:0;}
+  .utc-icon{font-size:24px;margin-bottom:8px;}
+  .utc-title{font-size:14px;font-weight:600;color:var(--dark);margin-bottom:4px;}
+  .utc-desc{font-size:12px;color:var(--text-muted);line-height:1.4;}
+  .utc-check{position:absolute;top:12px;right:12px;width:18px;height:18px;border-radius:50%;border:2px solid var(--border);background:white;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+  .user-type-card.selected .utc-check{background:var(--green);border-color:var(--green);}
+  .utc-check::after{content:'';width:6px;height:6px;border-radius:50%;background:white;opacity:0;transition:opacity 0.2s;}
+  .user-type-card.selected .utc-check::after{opacity:1;}
+
+  /* Photo upload */
+  .photo-upload{border:2px dashed var(--border);border-radius:12px;padding:24px;text-align:center;cursor:pointer;transition:all 0.2s;background:white;}
+  .photo-upload:hover{border-color:var(--green);background:var(--green-pale);}
+  .photo-upload-icon{font-size:32px;margin-bottom:8px;}
+  .photo-upload-text{font-size:13px;color:var(--text-muted);}
+  .photo-upload-text strong{color:var(--green);}
+  .photo-preview{display:none;align-items:center;gap:12px;background:var(--green-pale);border-radius:10px;padding:12px;}
+  .photo-preview img{width:48px;height:48px;border-radius:50%;object-fit:cover;}
+  .photo-preview-name{font-size:13px;font-weight:500;color:var(--dark);}
+  .photo-preview-size{font-size:11px;color:var(--text-muted);}
+  .photo-remove{font-size:11px;color:var(--red);cursor:pointer;margin-left:auto;}
+
+  /* Terms */
+  .terms-row{display:flex;align-items:flex-start;gap:10px;margin-top:4px;}
+  .terms-row input[type="checkbox"]{width:16px;height:16px;margin-top:2px;flex-shrink:0;accent-color:var(--green);cursor:pointer;}
+  .terms-row label{font-size:13px;color:var(--text-muted);line-height:1.5;cursor:pointer;}
+  .terms-row label a{color:var(--green);text-decoration:none;}
+
+  /* Buttons */
+  .form-actions{display:flex;gap:12px;align-items:center;margin-top:28px;}
+  .btn-next,.btn-submit{flex:1;padding:14px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;background:var(--green);color:white;border:none;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+  .btn-next:hover,.btn-submit:hover{background:var(--green-light);transform:translateY(-1px);}
+  .btn-next:disabled,.btn-submit:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
+  .btn-back{padding:14px 20px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;background:transparent;color:var(--text-muted);border:1.5px solid var(--border);cursor:pointer;transition:all 0.2s;}
+  .btn-back:hover{border-color:rgba(0,106,78,0.4);color:var(--green);}
+
+  /* Error banner */
+  .error-banner{display:none;align-items:flex-start;gap:10px;background:#FFF0F0;border:1px solid rgba(217,48,37,0.25);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--error);line-height:1.5;}
+  .error-banner.show{display:flex;}
+  .error-banner-icon{font-size:16px;flex-shrink:0;}
+
+  /* Email taken */
+  .email-taken-note{font-size:12px;color:var(--error);margin-top:4px;display:none;}
+  .email-taken-note.show{display:block;}
+
+  /* Success */
+  .success-screen{display:none;text-align:center;padding:40px 0;animation:slideIn 0.4s ease;}
+  .success-screen.visible{display:block;}
+  .success-icon{width:72px;height:72px;border-radius:50%;background:var(--green-pale);border:3px solid var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:30px;}
+  .success-screen h2{font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:var(--dark);margin-bottom:12px;}
+  .success-screen p{font-size:15px;color:var(--text-muted);line-height:1.7;margin-bottom:8px;}
+  .success-note{font-size:13px;color:var(--text-muted);background:var(--off-white);border-radius:10px;padding:14px 16px;margin:16px 0 24px;text-align:left;line-height:1.7;}
+  .success-note strong{color:var(--dark);}
+  .btn-go-login{display:inline-block;padding:13px 32px;border-radius:10px;background:var(--green);color:white;font-size:14px;font-weight:600;text-decoration:none;transition:background 0.2s;}
+  .btn-go-login:hover{background:var(--green-light);}
+
+  /* Loading overlay */
+  .loading-overlay{position:fixed;inset:0;background:rgba(255,255,255,0.88);z-index:999;display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px;}
+  .loading-overlay.show{display:flex;}
+  .spinner{width:44px;height:44px;border:3px solid var(--green-pale);border-top-color:var(--green);border-radius:50%;animation:spin 0.8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .loading-text{font-size:14px;font-weight:500;color:var(--text-muted);}
+
+  @media(max-width:900px){
+    .page-wrap{grid-template-columns:1fr;}
+    .left-panel{display:none;}
+    .right-panel{padding:32px 24px;max-width:100%;}
+    .form-row{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loadingText">Creating your account…</div>
+</div>
+
+<div class="page-wrap">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div class="left-bg"></div>
+    <div class="left-pattern"></div>
+    <div class="left-top">
+      <a href="index.html" class="brand-link">
+        <div class="brand-logo">DPI</div>
+        <span class="brand-name">DPI Society</span>
+      </a>
+      <h2 class="left-headline">Join Your<br><span class="accent">Alumni Family</span><br>Today</h2>
+      <p class="left-sub">Create your free account and connect with thousands of Dhaka Polytechnic Institute graduates.</p>
+      <div class="benefit-list">
+        <div class="benefit-item"><div class="benefit-dot"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#7DDFB8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="benefit-text">Find and connect with batchmates from any department</span></div>
+        <div class="benefit-item"><div class="benefit-dot"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#7DDFB8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="benefit-text">Access & share study materials and project resources</span></div>
+        <div class="benefit-item"><div class="benefit-dot"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#7DDFB8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="benefit-text">RSVP for reunions, seminars and alumni events</span></div>
+        <div class="benefit-item"><div class="benefit-dot"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#7DDFB8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="benefit-text">Post in the forum and get career advice from seniors</span></div>
+        <div class="benefit-item"><div class="benefit-dot"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#7DDFB8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="benefit-text">100% free for all DPI ex-students — always</span></div>
+      </div>
+    </div>
+    <div class="left-bottom">
+      <div class="left-stats">
+        <div class="ls-item"><div class="ls-num">1,240+</div><div class="ls-label">Members</div></div>
+        <div class="ls-item"><div class="ls-num">18</div><div class="ls-label">Departments</div></div>
+        <div class="ls-item"><div class="ls-num">Free</div><div class="ls-label">Always</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+
+    <!-- SUCCESS SCREEN -->
+    <div class="success-screen" id="successScreen">
+      <div class="success-icon">✓</div>
+      <h2>Welcome to DPI Society!</h2>
+      <p>Your account has been created successfully.</p>
+      <div class="success-note">
+        <strong>📧 Check your email inbox.</strong><br>
+        We sent a verification link to <strong id="successEmail"></strong>.<br>
+        Click the link to verify your email, then log in.<br><br>
+        <strong>⏳ Note:</strong> Your account will be reviewed by an admin before full access is granted. You'll receive an email once approved.
+      </div>
+      <a href="login.html" class="btn-go-login">Go to Login →</a>
+    </div>
+
+    <!-- FORM -->
+    <div id="formContainer">
+      <div class="form-header">
+        <div class="form-step-indicator">
+          <div class="step-pill active" id="pill1"></div>
+          <div class="step-pill inactive" id="pill2"></div>
+          <div class="step-pill inactive" id="pill3"></div>
+          <span class="step-label" id="stepLabel">Step 1 of 3 — Account Type</span>
+        </div>
+        <h1 class="form-title" id="formTitle">Create Your Account</h1>
+        <p class="form-subtitle">Already have an account? <a href="login.html">Log in here</a></p>
+      </div>
+
+      <!-- STEP 1 -->
+      <div class="form-step active" id="step1">
+        <div class="error-banner" id="step1Error"><span class="error-banner-icon">⚠️</span><span id="step1ErrorText"></span></div>
+
+        <div style="margin-bottom:20px;">
+          <div class="field" style="margin-bottom:8px;"><label>I am joining as <span>*</span></label></div>
+          <div class="user-type-grid">
+            <div class="user-type-card selected" onclick="selectType(this,'member')">
+              <input type="radio" name="userType" value="member" checked>
+              <div class="utc-icon">🎓</div>
+              <div class="utc-title">Alumni Member</div>
+              <div class="utc-desc">Ex-student of Dhaka Polytechnic Institute</div>
+              <div class="utc-check"></div>
+            </div>
+            <div class="user-type-card" onclick="selectType(this,'admin')">
+              <input type="radio" name="userType" value="admin">
+              <div class="utc-icon">⚙️</div>
+              <div class="utc-title">Administrator</div>
+              <div class="utc-desc">Society committee member with admin access</div>
+              <div class="utc-check"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label>First Name <span>*</span></label>
+            <input type="text" id="firstName" placeholder="e.g. Rafiqul" autocomplete="given-name">
+            <span class="field-error">Please enter your first name</span>
+          </div>
+          <div class="field">
+            <label>Last Name <span>*</span></label>
+            <input type="text" id="lastName" placeholder="e.g. Alam" autocomplete="family-name">
+            <span class="field-error">Please enter your last name</span>
+          </div>
+        </div>
+
+        <div class="form-row single">
+          <div class="field">
+            <label>Email Address <span>*</span></label>
+            <input type="email" id="email" placeholder="your@email.com" autocomplete="email" oninput="clearEmailError()">
+            <span class="field-error">Please enter a valid email</span>
+            <span class="email-taken-note" id="emailTakenNote">This email is already registered. <a href="login.html" style="color:var(--green);">Log in instead?</a></span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label>Password <span>*</span></label>
+            <input type="password" id="password" placeholder="Min. 8 characters" oninput="checkStrength(this.value)">
+            <div class="pw-strength">
+              <div class="pw-bars">
+                <div class="pw-bar" id="bar1"></div><div class="pw-bar" id="bar2"></div>
+                <div class="pw-bar" id="bar3"></div><div class="pw-bar" id="bar4"></div>
+              </div>
+              <span class="pw-label" id="pwLabel">Enter a password</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>Confirm Password <span>*</span></label>
+            <input type="password" id="confirmPassword" placeholder="Repeat password">
+            <span class="field-error">Passwords do not match</span>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-next" onclick="goStep(2)">
+            Continue — Academic Details
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="form-step" id="step2">
+        <div class="error-banner" id="step2Error"><span class="error-banner-icon">⚠️</span><span id="step2ErrorText"></span></div>
+
+        <div class="form-row">
+          <div class="field">
+            <label>Batch / Intake <span>*</span></label>
+            <select id="batch">
+              <option value="">Select batch</option>
+              <option>Batch 55</option><option>Batch 56</option><option>Batch 57</option>
+              <option>Batch 58</option><option>Batch 59</option><option>Batch 60</option>
+              <option>Batch 61</option><option>Batch 62</option><option>Batch 63</option>
+              <option>Batch 64</option><option>Batch 65</option><option>Batch 66</option>
+              <option>Batch 67</option><option>Batch 68</option><option>Batch 69</option>
+              <option>Batch 70</option><option>Batch 71</option><option>Batch 72</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Passing Year</label>
+            <input type="number" id="passYear" placeholder="e.g. 2018" min="1960" max="2030">
+          </div>
+        </div>
+
+        <div class="form-row single">
+          <div class="field">
+            <label>Department <span>*</span></label>
+            <select id="department">
+              <option value="">Select your department</option>
+              <option>Civil Technology</option>
+              <option>Computer Technology</option>
+              <option>Electrical Technology</option>
+              <option>Electronics Technology</option>
+              <option>Mechanical Technology</option>
+              <option>Power Technology</option>
+              <option>Automobile Technology</option>
+              <option>Refrigeration & Air Conditioning</option>
+              <option>Telecommunication Technology</option>
+              <option>Architecture & Interior Design</option>
+              <option>Surveying Technology</option>
+              <option>Chemical Technology</option>
+              <option>Environmental Technology</option>
+              <option>Food Technology</option>
+              <option>Garment Design & Pattern Making</option>
+              <option>Graphic Design</option>
+              <option>Ship Building Technology</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label>Student ID (Roll)</label>
+            <input type="text" id="studentId" placeholder="e.g. 123456">
+            <span class="field-hint">Optional — helps verify alumni status</span>
+          </div>
+          <div class="field">
+            <label>Phone Number</label>
+            <input type="tel" id="phone" placeholder="+880 1X XXXX XXXX">
+          </div>
+        </div>
+
+        <div class="form-row single">
+          <div class="field">
+            <label>Current Location</label>
+            <input type="text" id="location" placeholder="e.g. Dhaka, Bangladesh">
+          </div>
+        </div>
+
+        <div class="form-row single">
+          <div class="field">
+            <label>Current Profession / Job Title</label>
+            <input type="text" id="profession" placeholder="e.g. Civil Engineer at XYZ Company">
+            <span class="field-hint">Optional — shown on your public profile</span>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-back" onclick="goStep(1)">← Back</button>
+          <button class="btn-next" onclick="goStep(3)">
+            Continue — Profile Photo
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="form-step" id="step3">
+        <div class="error-banner" id="step3Error"><span class="error-banner-icon">⚠️</span><span id="step3ErrorText"></span></div>
+
+        <div class="form-row single" style="margin-bottom:16px;">
+          <div class="field">
+            <label>Profile Photo</label>
+            <div class="photo-upload" id="photoUpload" onclick="document.getElementById('photoInput').click()">
+              <div class="photo-upload-icon">📷</div>
+              <div class="photo-upload-text"><strong>Click to upload</strong> or drag & drop<br>JPG, PNG — max 5MB</div>
+            </div>
+            <div class="photo-preview" id="photoPreview">
+              <img id="previewImg" src="" alt="">
+              <div><div class="photo-preview-name" id="previewName"></div><div class="photo-preview-size" id="previewSize"></div></div>
+              <span class="photo-remove" onclick="removePhoto()">✕ Remove</span>
+            </div>
+            <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handlePhoto(this)">
+          </div>
+        </div>
+
+        <div class="form-row single">
+          <div class="field">
+            <label>Short Bio</label>
+            <textarea id="bio" rows="3" placeholder="Tell other alumni a little about yourself..." style="resize:vertical;" maxlength="250"></textarea>
+            <span class="field-hint">Optional — max 250 characters</span>
+          </div>
+        </div>
+
+        <div class="form-row single">
+          <div class="field">
+            <label>LinkedIn Profile URL</label>
+            <input type="url" id="linkedin" placeholder="https://linkedin.com/in/yourname">
+          </div>
+        </div>
+
+        <div style="margin-top:8px;">
+          <div class="terms-row">
+            <input type="checkbox" id="terms">
+            <label for="terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a> of DPI Society</label>
+          </div>
+          <div class="terms-row" style="margin-top:8px;">
+            <input type="checkbox" id="newsletter" checked>
+            <label for="newsletter">Send me updates about DPI Society events and announcements</label>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-back" onclick="goStep(2)">← Back</button>
+          <button class="btn-submit" id="submitBtn" onclick="submitForm()">🎓 Create My Account</button>
+        </div>
+      </div>
+
+    </div><!-- /formContainer -->
+  </div>
+</div>
+
+<script>
+// ── STATE ──
+let currentStep = 1;
+let selectedType = 'member';
+let photoFile = null;
+
+// ── UI HELPERS ──
+function showError(step, msg) {
+  const b = document.getElementById('step'+step+'Error');
+  document.getElementById('step'+step+'ErrorText').textContent = msg;
+  b.classList.add('show');
+  b.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+function hideError(step) { document.getElementById('step'+step+'Error').classList.remove('show'); }
+function showLoading(msg) {
+  document.getElementById('loadingText').textContent = msg || 'Please wait…';
+  document.getElementById('loadingOverlay').classList.add('show');
+}
+function hideLoading() { document.getElementById('loadingOverlay').classList.remove('show'); }
+function clearEmailError() {
+  document.getElementById('emailTakenNote').classList.remove('show');
+  document.getElementById('email').classList.remove('error');
+}
+
+// ── SELECT TYPE ──
+function selectType(card, type) {
+  document.querySelectorAll('.user-type-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  selectedType = type;
+}
+
+// ── STEP NAVIGATION ──
+function goStep(step) {
+  hideError(currentStep);
+
+  if (step === 2 && currentStep === 1) {
+    const fn = document.getElementById('firstName');
+    const ln = document.getElementById('lastName');
+    const em = document.getElementById('email');
+    const pw = document.getElementById('password');
+    const cpw = document.getElementById('confirmPassword');
+    let valid = true;
+    [fn, ln].forEach(f => { if (!f.value.trim()) { f.classList.add('error'); valid=false; } else f.classList.remove('error'); });
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em.value)) { em.classList.add('error'); valid=false; } else em.classList.remove('error');
+    if (pw.value.length < 8) { pw.classList.add('error'); valid=false; } else pw.classList.remove('error');
+    if (pw.value !== cpw.value) { cpw.classList.add('error'); valid=false; } else cpw.classList.remove('error');
+    if (!valid) { showError(1, 'Please fill in all required fields correctly.'); return; }
+  }
+
+  if (step === 3 && currentStep === 2) {
+    const batch = document.getElementById('batch');
+    const dept = document.getElementById('department');
+    let valid = true;
+    [batch, dept].forEach(f => { if (!f.value) { f.classList.add('error'); valid=false; } else f.classList.remove('error'); });
+    if (!valid) { showError(2, 'Please select your batch and department.'); return; }
+  }
+
+  document.getElementById('step'+currentStep).classList.remove('active');
+  currentStep = step;
+  document.getElementById('step'+currentStep).classList.add('active');
+
+  const labels = ['Account Type','Academic Details','Profile & Finish'];
+  const titles = ['Create Your Account','Academic Information','Final Touches'];
+  document.getElementById('stepLabel').textContent = `Step ${step} of 3 — ${labels[step-1]}`;
+  document.getElementById('formTitle').textContent = titles[step-1];
+  ['pill1','pill2','pill3'].forEach((id,i) => {
+    document.getElementById(id).className = 'step-pill '+(i+1 < step ? 'done' : i+1===step ? 'active' : 'inactive');
+  });
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+// ── PASSWORD STRENGTH ──
+function checkStrength(val) {
+  const bars = [1,2,3,4].map(i => document.getElementById('bar'+i));
+  const label = document.getElementById('pwLabel');
+  bars.forEach(b => b.className = 'pw-bar');
+  if (!val) { label.textContent = 'Enter a password'; return; }
+  let score = 0;
+  if (val.length >= 8) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  const cls = ['weak','weak','fair','strong'];
+  const texts = ['Too weak','Weak','Fair — add symbols','Strong password'];
+  for (let i=0; i<score; i++) bars[i].className = 'pw-bar '+(cls[score-1]);
+  label.textContent = texts[score-1] || 'Too weak';
+}
+
+// ── PHOTO UPLOAD ──
+function handlePhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 5*1024*1024) { alert('Photo must be under 5MB.'); input.value=''; return; }
+  photoFile = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('previewImg').src = e.target.result;
+    document.getElementById('previewName').textContent = file.name;
+    document.getElementById('previewSize').textContent = (file.size/1024).toFixed(0)+' KB';
+    document.getElementById('photoUpload').style.display = 'none';
+    document.getElementById('photoPreview').style.display = 'flex';
+  };
+  reader.readAsDataURL(file);
+}
+function removePhoto() {
+  photoFile = null;
+  document.getElementById('photoInput').value = '';
+  document.getElementById('photoUpload').style.display = 'block';
+  document.getElementById('photoPreview').style.display = 'none';
+}
+const pu = document.getElementById('photoUpload');
+pu.addEventListener('dragover', e => { e.preventDefault(); pu.style.borderColor='var(--green)'; });
+pu.addEventListener('dragleave', () => { pu.style.borderColor=''; });
+pu.addEventListener('drop', e => {
+  e.preventDefault(); pu.style.borderColor='';
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) {
+    const dt = new DataTransfer(); dt.items.add(file);
+    document.getElementById('photoInput').files = dt.files;
+    handlePhoto(document.getElementById('photoInput'));
+  }
+});
+
+// ══════════════════════════════════════════════════════
+//  MAIN SUBMIT — REAL SUPABASE REGISTRATION
+// ══════════════════════════════════════════════════════
+async function submitForm() {
+  hideError(3);
+
+  if (!document.getElementById('terms').checked) {
+    showError(3, 'You must agree to the Terms of Service to continue.');
+    return;
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Creating account…';
+
+  // Collect all form values
+  const firstName  = document.getElementById('firstName').value.trim();
+  const lastName   = document.getElementById('lastName').value.trim();
+  const email      = document.getElementById('email').value.trim().toLowerCase();
+  const password   = document.getElementById('password').value;
+  const batch      = document.getElementById('batch').value;
+  const department = document.getElementById('department').value;
+  const passYear   = document.getElementById('passYear').value;
+  const phone      = document.getElementById('phone').value.trim();
+  const location   = document.getElementById('location').value.trim();
+  const profession = document.getElementById('profession').value.trim();
+  const bio        = document.getElementById('bio').value.trim();
+  const linkedin   = document.getElementById('linkedin').value.trim();
+  const fullName   = `${firstName} ${lastName}`;
+
+  try {
+    // ── 1. Create Supabase Auth account ──────────────────
+    showLoading('Creating your account…');
+
+    const { data: authData, error: authError } = await window.sb.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: fullName }
+        // Uncomment after deploying your site:
+        // emailRedirectTo: 'https://yourdomain.com/login.html'
+      }
+    });
+
+    if (authError) {
+      hideLoading();
+      btn.disabled = false;
+      btn.innerHTML = '🎓 Create My Account';
+
+      // Friendly error messages for common Supabase errors
+      const msg = authError.message.toLowerCase();
+      if (msg.includes('already registered') || msg.includes('already been registered')) {
+        document.getElementById('emailTakenNote').classList.add('show');
+        goStep(1);
+        showError(1, 'This email address is already registered with DPI Society.');
+        return;
+      }
+      if (msg.includes('invalid email')) {
+        goStep(1);
+        document.getElementById('email').classList.add('error');
+        showError(1, 'Please enter a valid email address.');
+        return;
+      }
+      if (msg.includes('password') || msg.includes('weak')) {
+        goStep(1);
+        document.getElementById('password').classList.add('error');
+        showError(1, 'Password too weak. Use at least 8 characters with uppercase, numbers, and symbols.');
+        return;
+      }
+      showError(3, 'Registration failed: ' + authError.message);
+      return;
+    }
+
+    const userId = authData?.user?.id;
+    if (!userId) {
+      hideLoading();
+      btn.disabled = false;
+      btn.innerHTML = '🎓 Create My Account';
+      showError(3, 'Could not create your account. Please try again.');
+      return;
+    }
+
+    // ── 2. Upload profile photo to Supabase Storage ──────
+    let avatarUrl = null;
+    if (photoFile) {
+      showLoading('Uploading your profile photo…');
+      const ext      = photoFile.name.split('.').pop().toLowerCase();
+      const filePath = `avatars/${userId}.${ext}`;
+
+      const { error: uploadError } = await window.sb.storage
+        .from('avatars')
+        .upload(filePath, photoFile, { upsert: true });
+
+      if (!uploadError) {
+        const { data: { publicUrl } } = window.sb.storage
+          .from('avatars')
+          .getPublicUrl(filePath);
+        avatarUrl = publicUrl;
+      }
+      // Photo failure is non-fatal — account still created
+    }
+
+    // ── 3. Save full profile details to profiles table ───
+    showLoading('Saving your profile…');
+
+    const { error: profileError } = await window.sb
+      .from('profiles')
+      .update({
+        full_name:    fullName,
+        email:        email,
+        batch:        batch         || null,
+        department:   department    || null,
+        passing_year: passYear      ? parseInt(passYear) : null,
+        phone:        phone         || null,
+        location:     location      || null,
+        profession:   profession    || null,
+        bio:          bio           || null,
+        linkedin_url: linkedin      || null,
+        avatar_url:   avatarUrl,
+        user_type:    selectedType,      // 'member' or 'admin'
+        status:       'pending',         // Admin approves in admin panel
+        updated_at:   new Date().toISOString()
+      })
+      .eq('id', userId);
+
+    if (profileError) {
+      // Profile save failed — log it but don't block the user
+      // Auth account exists, they can update profile later
+      console.warn('Profile update warning (non-fatal):', profileError.message);
+    }
+
+    // ── 4. Show success screen ────────────────────────────
+    hideLoading();
+    document.getElementById('successEmail').textContent = email;
+    document.getElementById('formContainer').style.display = 'none';
+    document.getElementById('successScreen').classList.add('visible');
+    window.scrollTo({ top:0, behavior:'smooth' });
+
+  } catch (err) {
+    hideLoading();
+    btn.disabled = false;
+    btn.innerHTML = '🎓 Create My Account';
+    console.error('Unexpected registration error:', err);
+    showError(3, 'An unexpected error occurred. Please check your internet connection and try again.');
+  }
+}
+
+// ── REDIRECT IF ALREADY LOGGED IN ──
+window.addEventListener('load', async () => {
+  try {
+    const { data: { session } } = await window.sb.auth.getSession();
+    if (session) window.location.href = 'index.html';
+  } catch (e) {
+    // Supabase credentials not set yet — ignore and show the form
+  }
+});
+</script>
+<div id="dpiToast"></div>
+</body>
+</html>

@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Community Forum — DPI Society</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<!-- ✅ SUPABASE SDK -->
+<script src="config.js"></script>
+<style>
+  :root {
+    --green:#006A4E; --green-light:#00875F; --green-pale:#E8F5F0; --green-mid:#00A36C;
+    --red:#C8102E; --red-pale:#FFF0F1;
+    --gold:#F4A600; --gold-pale:#FFF8E6;
+    --dark:#0D1A13; --text:#1A2E22; --text-muted:#5A7A68;
+    --border:rgba(0,106,78,0.13); --white:#FFFFFF; --off-white:#F7FAF8;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--off-white);color:var(--text);}
+
+  /* NAV */
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,0.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);height:64px;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;}
+  .nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+  .nav-logo{width:38px;height:38px;border-radius:9px;background:var(--green);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:15px;font-weight:900;color:white;}
+  .nav-brand-text strong{display:block;font-size:14px;font-weight:600;color:var(--green);}
+  .nav-brand-text span{font-size:11px;color:var(--text-muted);}
+  .nav-links{display:flex;gap:4px;list-style:none;}
+  .nav-links a{font-size:13px;font-weight:500;color:var(--text-muted);text-decoration:none;padding:6px 12px;border-radius:6px;transition:all 0.2s;}
+  .nav-links a:hover,.nav-links a.active{color:var(--green);background:var(--green-pale);}
+  .nav-actions{display:flex;gap:8px;align-items:center;}
+  .btn-n-out{font-size:13px;font-weight:500;padding:7px 16px;border-radius:7px;border:1.5px solid var(--green);color:var(--green);background:transparent;cursor:pointer;text-decoration:none;transition:all 0.2s;}
+  .btn-n-out:hover{background:var(--green-pale);}
+  .btn-n-pri{font-size:13px;font-weight:500;padding:7px 16px;border-radius:7px;border:none;background:var(--green);color:white;cursor:pointer;text-decoration:none;transition:all 0.2s;}
+  .btn-n-pri:hover{background:var(--green-light);}
+  .nav-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:var(--green-pale);color:var(--green);cursor:pointer;border:2px solid var(--green);}
+
+  /* PAGE HEADER */
+  .page-header{background:var(--dark);padding:80px 2rem 40px;position:relative;overflow:hidden;}
+  .ph-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 90% at 95% 50%,rgba(0,106,78,0.3) 0%,transparent 65%),radial-gradient(ellipse 40% 60% at 5% 80%,rgba(200,16,46,0.1) 0%,transparent 60%);}
+  .ph-inner{position:relative;z-index:2;max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:20px;}
+  .ph-label{font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-mid);margin-bottom:10px;}
+  .ph-title{font-family:'Playfair Display',serif;font-size:36px;font-weight:900;color:white;margin-bottom:8px;}
+  .ph-sub{font-size:15px;color:rgba(255,255,255,0.5);margin-bottom:20px;}
+  .ph-stats{display:flex;gap:24px;flex-wrap:wrap;}
+  .ph-stat-num{font-size:20px;font-weight:700;color:white;}
+  .ph-stat-label{font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;}
+  .btn-new-post{display:inline-flex;align-items:center;gap:8px;padding:13px 24px;border-radius:10px;background:var(--gold);color:var(--dark);border:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;flex-shrink:0;}
+  .btn-new-post:hover{background:#e09800;transform:translateY(-1px);}
+
+  /* TABS */
+  .tabs-bar{background:white;border-bottom:1px solid var(--border);position:sticky;top:64px;z-index:90;}
+  .tabs-inner{max-width:1200px;margin:0 auto;padding:0 2rem;display:flex;overflow-x:auto;}
+  .tabs-inner::-webkit-scrollbar{height:0;}
+  .tab-btn{padding:14px 18px;font-size:13px;font-weight:500;color:var(--text-muted);background:transparent;border:none;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:all 0.2s;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:6px;}
+  .tab-btn:hover{color:var(--green);}
+  .tab-btn.active{color:var(--green);border-bottom-color:var(--green);font-weight:600;}
+  .tab-count{background:var(--green-pale);color:var(--green);font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;}
+  .tab-btn.active .tab-count{background:var(--green);color:white;}
+
+  /* MAIN LAYOUT */
+  .main-layout{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 300px;gap:24px;padding:24px 2rem 60px;align-items:start;}
+
+  /* SIDEBAR */
+  .sidebar{display:flex;flex-direction:column;gap:16px;}
+  .sidebar-card{background:white;border:1px solid var(--border);border-radius:16px;padding:18px;}
+  .sc-title{font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:14px;}
+  .forum-search{position:relative;}
+  .forum-search input{width:100%;padding:10px 13px 10px 36px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:var(--off-white);outline:none;transition:all 0.2s;}
+  .forum-search input:focus{border-color:var(--green);background:white;box-shadow:0 0 0 3px rgba(0,106,78,0.07);}
+  .forum-search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none;}
+  .cat-list{display:flex;flex-direction:column;gap:2px;}
+  .cat-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;transition:all 0.18s;font-size:13px;color:var(--text-muted);border:none;background:transparent;font-family:'DM Sans',sans-serif;text-align:left;width:100%;}
+  .cat-item:hover{background:var(--off-white);color:var(--text);}
+  .cat-item.active{background:var(--green-pale);color:var(--green);font-weight:600;}
+  .cat-icon{font-size:16px;width:22px;text-align:center;}
+  .cat-count{margin-left:auto;font-size:11px;background:var(--off-white);color:var(--text-muted);padding:1px 7px;border-radius:10px;}
+  .cat-item.active .cat-count{background:rgba(0,106,78,0.15);color:var(--green);}
+  .contributor-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border);}
+  .contributor-row:last-child{border-bottom:none;}
+  .con-rank{font-size:12px;font-weight:700;color:var(--text-muted);width:18px;text-align:center;}
+  .con-rank.gold-rank{color:var(--gold);}
+  .con-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+  .con-name{font-size:13px;font-weight:500;color:var(--dark);flex:1;}
+  .con-posts{font-size:11px;color:var(--text-muted);}
+  .tag-cloud{display:flex;flex-wrap:wrap;gap:6px;}
+  .trend-tag{font-size:12px;font-weight:500;color:var(--green);background:var(--green-pale);padding:4px 10px;border-radius:100px;cursor:pointer;transition:all 0.18s;border:1px solid transparent;}
+  .trend-tag:hover{border-color:rgba(0,106,78,0.3);}
+
+  /* POSTS CONTROLS */
+  .posts-controls{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
+  .posts-count{font-size:13px;color:var(--text-muted);}
+  .posts-count strong{color:var(--dark);}
+  .sort-select{padding:8px 24px 8px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:white;outline:none;cursor:pointer;appearance:none;}
+  .sort-wrap{position:relative;}
+  .sort-wrap::after{content:'▾';position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text-muted);font-size:12px;}
+
+  /* POST CARD */
+  .post-card{background:white;border:1px solid var(--border);border-radius:14px;margin-bottom:12px;transition:all 0.2s;cursor:pointer;overflow:hidden;}
+  .post-card:hover{box-shadow:0 6px 24px rgba(0,0,0,0.07);border-color:rgba(0,106,78,0.2);}
+  .post-card.pinned{border-left:3px solid var(--gold);}
+  .pc-inner{padding:18px 20px 14px;}
+  .pc-top{display:flex;align-items:flex-start;gap:14px;}
+  .pc-vote{display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0;padding-top:2px;}
+  .vote-btn{width:28px;height:28px;border-radius:7px;border:1.5px solid var(--border);background:white;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;color:var(--text-muted);}
+  .vote-btn:hover{border-color:var(--green);color:var(--green);background:var(--green-pale);}
+  .vote-btn.voted{background:var(--green);border-color:var(--green);color:white;}
+  .vote-count{font-size:13px;font-weight:700;color:var(--dark);}
+  .pc-body{flex:1;min-width:0;}
+  .pc-badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+  .pc-badge{font-size:10px;font-weight:700;letter-spacing:0.06em;padding:3px 9px;border-radius:5px;}
+  .badge-pinned{background:#FFF8E6;color:#B87800;}
+  .badge-answered{background:#E8FFF4;color:#0D7A4E;}
+  .badge-mine{background:#EEF3FF;color:#1A4FA0;}
+  .pc-cat-tag{font-size:10px;font-weight:600;color:var(--green);background:var(--green-pale);padding:3px 9px;border-radius:5px;}
+  .pc-title{font-size:15px;font-weight:600;color:var(--dark);margin-bottom:6px;line-height:1.35;}
+  .pc-preview{font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .pc-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;}
+  .pc-tag{font-size:11px;color:var(--text-muted);background:var(--off-white);padding:2px 8px;border-radius:4px;}
+  .pc-footer{display:flex;align-items:center;gap:12px;padding-top:12px;border-top:1px solid var(--border);}
+  .pc-author{display:flex;align-items:center;gap:8px;}
+  .pc-avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;}
+  .pc-author-name{font-size:12px;font-weight:500;color:var(--dark);}
+  .pc-author-meta{font-size:11px;color:var(--text-muted);}
+  .pc-stats{display:flex;gap:12px;margin-left:auto;}
+  .pc-stat{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-muted);cursor:pointer;}
+  .pc-stat:hover{color:var(--green);}
+
+  /* Skeleton */
+  .skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:8px;}
+  @keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+  .skel-post{background:white;border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-bottom:12px;display:flex;flex-direction:column;gap:10px;}
+  .skel-line{height:12px;border-radius:4px;}
+  .skel-line.w90{width:90%;}.skel-line.w70{width:70%;}.skel-line.w50{width:50%;}.skel-line.w30{width:30%;}
+
+  /* Empty / error */
+  .empty-state{text-align:center;padding:60px 20px;}
+  .empty-icon{font-size:44px;margin-bottom:12px;}
+  .empty-state h3{font-size:18px;font-weight:600;color:var(--dark);margin-bottom:8px;}
+  .empty-state p{font-size:14px;color:var(--text-muted);}
+  .btn-retry{padding:10px 24px;border-radius:9px;background:var(--green);color:white;border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;margin-top:16px;}
+  .btn-retry:hover{background:var(--green-light);}
+
+  /* Pagination */
+  .pagination{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:20px;}
+  .page-btn{width:36px;height:36px;border-radius:8px;border:1.5px solid var(--border);background:white;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--text-muted);cursor:pointer;transition:all 0.18s;display:flex;align-items:center;justify-content:center;}
+  .page-btn:hover{border-color:var(--green);color:var(--green);}
+  .page-btn.active{background:var(--green);border-color:var(--green);color:white;}
+  .page-btn:disabled{opacity:0.35;cursor:not-allowed;}
+
+  /* THREAD VIEW */
+  .thread-view{display:none;}
+  .thread-view.active{display:block;}
+  .posts-list-view{display:block;}
+  .posts-list-view.hidden{display:none;}
+  .thread-header{background:white;border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:16px;}
+  .back-btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--green);cursor:pointer;margin-bottom:16px;background:none;border:none;font-family:'DM Sans',sans-serif;padding:0;}
+  .back-btn:hover{text-decoration:underline;}
+  .th-badges{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+  .th-title{font-family:'Playfair Display',serif;font-size:24px;font-weight:900;color:var(--dark);margin-bottom:12px;line-height:1.2;}
+  .th-body{font-size:15px;color:var(--text);line-height:1.75;margin-bottom:18px;white-space:pre-wrap;}
+  .th-meta{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-top:16px;border-top:1px solid var(--border);}
+  .th-author{display:flex;align-items:center;gap:9px;}
+  .th-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;}
+  .th-author-name{font-size:14px;font-weight:600;color:var(--dark);}
+  .th-author-sub{font-size:12px;color:var(--text-muted);}
+  .th-actions{display:flex;gap:8px;margin-left:auto;}
+  .th-action-btn{display:flex;align-items:center;gap:5px;padding:7px 12px;border-radius:7px;border:1.5px solid var(--border);background:white;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:var(--text-muted);cursor:pointer;transition:all 0.2s;}
+  .th-action-btn:hover{border-color:var(--green);color:var(--green);background:var(--green-pale);}
+  .th-action-btn.voted{background:var(--green);border-color:var(--green);color:white;}
+
+  /* REPLIES */
+  .replies-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+  .replies-title{font-size:16px;font-weight:600;color:var(--dark);}
+  .reply-card{background:white;border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:10px;}
+  .reply-card.best-answer{border-color:rgba(13,122,78,0.4);background:#FAFFFE;}
+  .rc-top{display:flex;gap:12px;align-items:flex-start;}
+  .rc-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+  .rc-header{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;}
+  .rc-name{font-size:14px;font-weight:600;color:var(--dark);}
+  .rc-meta-txt{font-size:12px;color:var(--text-muted);}
+  .best-badge{background:#E8FFF4;color:#0D7A4E;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;}
+  .rc-body{font-size:14px;color:var(--text);line-height:1.7;white-space:pre-wrap;}
+  .rc-footer{display:flex;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);}
+  .rc-action{display:flex;align-items:center;gap:4px;padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:white;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text-muted);cursor:pointer;transition:all 0.18s;}
+  .rc-action:hover{border-color:var(--green);color:var(--green);background:var(--green-pale);}
+  .rc-action.liked{background:var(--red-pale);border-color:rgba(200,16,46,0.25);color:var(--red);}
+
+  /* REPLY COMPOSER */
+  .reply-composer{background:white;border:1px solid var(--border);border-radius:14px;padding:20px;margin-top:16px;}
+  .rc-composer-title{font-size:14px;font-weight:600;color:var(--dark);margin-bottom:14px;}
+  .login-to-reply{background:var(--green-pale);border:1px solid rgba(0,106,78,0.2);border-radius:10px;padding:16px;text-align:center;font-size:14px;color:var(--text-muted);}
+  .login-to-reply a{color:var(--green);font-weight:600;text-decoration:none;}
+  .composer-textarea{width:100%;min-height:120px;padding:12px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);resize:vertical;outline:none;transition:all 0.2s;background:var(--off-white);}
+  .composer-textarea:focus{border-color:var(--green);background:white;box-shadow:0 0 0 3px rgba(0,106,78,0.07);}
+  .composer-footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px;flex-wrap:wrap;gap:10px;}
+  .composer-hint{font-size:12px;color:var(--text-muted);}
+  .btn-post-reply{padding:11px 22px;border-radius:9px;background:var(--green);color:white;border:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:8px;}
+  .btn-post-reply:hover{background:var(--green-light);}
+  .btn-post-reply:disabled{opacity:0.55;cursor:not-allowed;}
+
+  /* NEW POST MODAL */
+  .modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(13,26,19,0.65);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+  .modal-overlay.open{opacity:1;pointer-events:all;}
+  .new-post-modal{background:white;border-radius:20px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;transform:scale(0.96) translateY(10px);transition:transform 0.25s;}
+  .modal-overlay.open .new-post-modal{transform:scale(1) translateY(0);}
+  .npm-header{padding:24px 28px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+  .npm-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--dark);}
+  .npm-close{width:32px;height:32px;border-radius:50%;background:var(--off-white);border:none;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;}
+  .npm-close:hover{background:#E0E0E0;}
+  .npm-body{padding:22px 28px;}
+  .npm-field{margin-bottom:16px;}
+  .npm-label{font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--text);margin-bottom:6px;display:block;}
+  .npm-label span{color:var(--red);}
+  .npm-input,.npm-select,.npm-textarea{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:var(--off-white);outline:none;transition:all 0.2s;}
+  .npm-input:focus,.npm-select:focus,.npm-textarea:focus{border-color:var(--green);background:white;box-shadow:0 0 0 3px rgba(0,106,78,0.07);}
+  .npm-textarea{min-height:140px;resize:vertical;}
+  .npm-select{appearance:none;cursor:pointer;}
+  .npm-select-wrap{position:relative;}
+  .npm-select-wrap::after{content:'▾';position:absolute;right:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text-muted);font-size:13px;}
+  .npm-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .npm-footer{padding:0 28px 24px;display:flex;gap:10px;}
+  .btn-npm-submit{flex:1;padding:13px;border-radius:10px;background:var(--green);color:white;border:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+  .btn-npm-submit:hover{background:var(--green-light);}
+  .btn-npm-submit:disabled{opacity:0.55;cursor:not-allowed;}
+  .btn-npm-cancel{padding:13px 18px;border-radius:10px;background:transparent;color:var(--text-muted);border:1.5px solid var(--border);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all 0.2s;}
+  .btn-npm-cancel:hover{border-color:rgba(200,16,46,0.3);color:var(--red);}
+
+  /* Toast */
+  .toast{position:fixed;bottom:28px;right:24px;background:var(--dark);color:white;font-size:13px;font-weight:500;padding:11px 20px;border-radius:10px;opacity:0;transition:all 0.3s;pointer-events:none;z-index:300;transform:translateY(6px);max-width:320px;}
+  .toast.show{opacity:1;transform:translateY(0);}
+
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .mini-spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,0.35);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;}
+
+  @media(max-width:900px){
+    .main-layout{grid-template-columns:1fr;}
+    .sidebar{display:none;}
+    nav .nav-links{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-brand">
+    <div class="nav-logo">DPI</div>
+    <div class="nav-brand-text">
+      <strong>DPI Society</strong>
+      <span>Alumni Network</span>
+    </div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="members.html">Members</a></li>
+    <li><a href="events.html">Events</a></li>
+    <li><a href="resources.html">Resources</a></li>
+    <li><a href="forum.html" class="active">Forum</a></li>
+  </ul>
+  <div class="nav-actions" id="navActions">
+    <a href="login.html" class="btn-n-out">Log In</a>
+    <a href="register.html" class="btn-n-pri">Join Free</a>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="ph-bg"></div>
+  <div class="ph-inner">
+    <div>
+      <div class="ph-label">💬 DPI Community</div>
+      <h1 class="ph-title">Community Forum</h1>
+      <p class="ph-sub">Ask questions, share knowledge, and connect with fellow DPI alumni</p>
+      <div class="ph-stats">
+        <div><div class="ph-stat-num" id="statPosts">—</div><div class="ph-stat-label">Total Posts</div></div>
+        <div><div class="ph-stat-num" id="statReplies">—</div><div class="ph-stat-label">Total Replies</div></div>
+        <div><div class="ph-stat-num" id="statMembers">—</div><div class="ph-stat-label">Contributors</div></div>
+      </div>
+    </div>
+    <button class="btn-new-post" onclick="openNewPost()">✏ Start New Post</button>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-bar">
+  <div class="tabs-inner">
+    <button class="tab-btn active" onclick="setTab('all',this)">🏠 All Posts <span class="tab-count" id="tc-all">—</span></button>
+    <button class="tab-btn" onclick="setTab('unanswered',this)">❓ Unanswered <span class="tab-count" id="tc-unanswered">—</span></button>
+    <button class="tab-btn" onclick="setTab('answered',this)">✅ Answered <span class="tab-count" id="tc-answered">—</span></button>
+    <button class="tab-btn" onclick="setTab('mine',this)">👤 My Posts <span class="tab-count" id="tc-mine">—</span></button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main-layout">
+
+  <!-- POSTS AREA -->
+  <div>
+    <div class="posts-list-view" id="postsListView">
+      <div class="posts-controls">
+        <div class="posts-count">Showing <strong id="showCount">—</strong> posts</div>
+        <div class="sort-wrap">
+          <select class="sort-select" id="postSort" onchange="loadPosts()">
+            <option value="recent">Most Recent</option>
+            <option value="votes">Most Votes</option>
+            <option value="replies">Most Replies</option>
+          </select>
+        </div>
+      </div>
+      <div id="postsContainer"></div>
+      <div class="pagination" id="pagination"></div>
+    </div>
+
+    <div class="thread-view" id="threadView">
+      <button class="back-btn" onclick="closeThread()">← Back to Forum</button>
+      <div class="thread-header" id="threadHeader"></div>
+      <div class="replies-header">
+        <div class="replies-title" id="repliesTitle">Replies</div>
+      </div>
+      <div id="repliesContainer"></div>
+      <div class="reply-composer" id="replyComposer">
+        <div class="rc-composer-title">💬 Write a Reply</div>
+        <div id="composerInner"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <div class="sc-title">Search</div>
+      <div class="forum-search">
+        <span class="forum-search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search posts…" oninput="onSearch()">
+      </div>
+    </div>
+
+    <div class="sidebar-card">
+      <div class="sc-title">Categories</div>
+      <div class="cat-list">
+        <button class="cat-item active" onclick="setCat('all',this)"><span class="cat-icon">📂</span>All Categories<span class="cat-count" id="cc-all">—</span></button>
+        <button class="cat-item" onclick="setCat('career',this)"><span class="cat-icon">💼</span>Career & Jobs<span class="cat-count" id="cc-career">—</span></button>
+        <button class="cat-item" onclick="setCat('study',this)"><span class="cat-icon">📚</span>Study Help<span class="cat-count" id="cc-study">—</span></button>
+        <button class="cat-item" onclick="setCat('tech',this)"><span class="cat-icon">💻</span>Technology<span class="cat-count" id="cc-tech">—</span></button>
+        <button class="cat-item" onclick="setCat('general',this)"><span class="cat-icon">💬</span>General Talk<span class="cat-count" id="cc-general">—</span></button>
+        <button class="cat-item" onclick="setCat('news',this)"><span class="cat-icon">📢</span>News & Updates<span class="cat-count" id="cc-news">—</span></button>
+        <button class="cat-item" onclick="setCat('batch',this)"><span class="cat-icon">🎓</span>Batch Rooms<span class="cat-count" id="cc-batch">—</span></button>
+      </div>
+    </div>
+
+    <div class="sidebar-card">
+      <div class="sc-title">Top Contributors</div>
+      <div id="topContributors"><div style="font-size:12px;color:var(--text-muted);">Loading…</div></div>
+    </div>
+
+    <div class="sidebar-card">
+      <div class="sc-title">Trending Tags</div>
+      <div class="tag-cloud" id="trendingTags"><div style="font-size:12px;color:var(--text-muted);">Loading…</div></div>
+    </div>
+  </aside>
+</div>
+
+<!-- NEW POST MODAL -->
+<div class="modal-overlay" id="postModalOverlay" onclick="closePostModal(event)">
+  <div class="new-post-modal">
+    <div class="npm-header">
+      <div class="npm-title">Start a New Post</div>
+      <button class="npm-close" onclick="closePostModalDirect()">✕</button>
+    </div>
+    <div class="npm-body">
+      <div id="npmLoginNotice" style="display:none;background:#FFF8E6;border:1px solid rgba(244,166,0,0.4);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#8B6000;">
+        ⚠ You must be <a href="login.html" style="color:var(--green);font-weight:600;">logged in</a> to post.
+      </div>
+      <div class="npm-field">
+        <label class="npm-label">Title <span>*</span></label>
+        <input class="npm-input" id="npmTitle" type="text" placeholder="What's your question or topic?" maxlength="200">
+      </div>
+      <div class="npm-row">
+        <div class="npm-field">
+          <label class="npm-label">Category <span>*</span></label>
+          <div class="npm-select-wrap">
+            <select class="npm-select" id="npmCat">
+              <option value="">Select category</option>
+              <option value="career">💼 Career & Jobs</option>
+              <option value="study">📚 Study Help</option>
+              <option value="tech">💻 Technology</option>
+              <option value="general">💬 General Talk</option>
+              <option value="news">📢 News & Updates</option>
+              <option value="batch">🎓 Batch Rooms</option>
+            </select>
+          </div>
+        </div>
+        <div class="npm-field">
+          <label class="npm-label">Department</label>
+          <div class="npm-select-wrap">
+            <select class="npm-select" id="npmDept">
+              <option value="">All Departments</option>
+              <option>Civil Technology</option>
+              <option>Computer Technology</option>
+              <option>Electrical Technology</option>
+              <option>Electronics Technology</option>
+              <option>Mechanical Technology</option>
+              <option>Power Technology</option>
+              <option>General</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="npm-field">
+        <label class="npm-label">Content <span>*</span></label>
+        <textarea class="npm-textarea" id="npmContent" placeholder="Describe your question or share your knowledge in detail…"></textarea>
+      </div>
+      <div class="npm-field">
+        <label class="npm-label">Tags</label>
+        <input class="npm-input" id="npmTags" type="text" placeholder="e.g. autocad, job-hunting, plc (comma separated)">
+      </div>
+    </div>
+    <div class="npm-footer">
+      <button class="btn-npm-cancel" onclick="closePostModalDirect()">Cancel</button>
+      <button class="btn-npm-submit" id="npmSubmitBtn" onclick="submitNewPost()">📤 Publish Post</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════════
+const PER_PAGE = 15;
+const AV_COLORS = [
+  {bg:'#D1F5E8',tc:'#006A4E'},{bg:'#FDEEF0',tc:'#C8102E'},
+  {bg:'#FFF3D4',tc:'#B87800'},{bg:'#E8F0FD',tc:'#2B5DB8'},
+  {bg:'#D4F5F0',tc:'#0D7A6A'},{bg:'#FDE8F0',tc:'#B82B6A'},
+  {bg:'#EDE8FD',tc:'#5B2BB8'},{bg:'#F0FAFF',tc:'#0A6A9E'},
+];
+
+const CAT_LABELS = {
+  career:'💼 Career', study:'📚 Study', tech:'💻 Tech',
+  general:'💬 General', news:'📢 News', batch:'🎓 Batch',
+};
+
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+let currentUser    = null;
+let currentProfile = null;
+let activeTab      = 'all';
+let activeCat      = 'all';
+let currentPage    = 1;
+let totalCount     = 0;
+let openPostId     = null;
+let votedPosts     = new Set();   // post IDs current user has voted on
+let likedReplies   = new Set();   // reply IDs current user has liked
+let searchTimeout  = null;
+let realtimeChannel= null;
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+window.addEventListener('load', async () => {
+  await DPI.initSession(); DPI.initNav(); DPI.toast = (m) => DPI.toast(m);
+  await loadPosts();
+  await loadSidebarData();
+  loadStats();
+  subscribeToNewPosts();
+});
+
+// ═══════════════════════════════════════════════
+//  SESSION
+// ═══════════════════════════════════════════════
+ } = await window.sb.auth.getSession();
+    if (!session) return;
+    currentUser = session.user;
+
+    const { data: p } = await window.sb.from('profiles').select('full_name,avatar_url,user_type,batch,department').eq('id', currentUser.id).single();
+    currentProfile = p;
+
+    const nav = document.getElementById('navActions');
+    const initials = p?.full_name ? p.full_name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase() : '?';
+    nav.innerHTML = p?.avatar_url
+      ? `<div class="nav-avatar"><img src="${esc(p.avatar_url)}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" alt=""></div>`
+      : `<div class="nav-avatar">${initials}</div>`;
+    if (p?.user_type === 'admin') nav.innerHTML += `<a href="admin.html" class="btn-n-pri" style="margin-left:8px;">⚙ Admin</a>`;
+
+    // Load votes the user has already cast
+    const { data: votes } = await window.sb.from('votes').select('post_id').eq('user_id', currentUser.id);
+    votedPosts = new Set((votes||[]).map(v => v.post_id));
+
+    // Load reply likes
+    const { data: likes } = await window.sb.from('reply_likes').select('reply_id').eq('user_id', currentUser.id);
+    likedReplies = new Set((likes||[]).map(l => l.reply_id));
+  } catch (e) { /* not configured */ }
+}
+
+// ═══════════════════════════════════════════════
+//  LOAD POSTS — server-side with full detail view
+// ═══════════════════════════════════════════════
+async function loadPosts() {
+  showSkeletons();
+  try {
+    const sort  = document.getElementById('postSort').value;
+    const q     = document.getElementById('searchInput').value.trim();
+
+    // Build query using the posts_with_details view
+    let query = window.sb
+      .from('posts_with_details')
+      .select('*', { count: 'exact' })
+      .range((currentPage - 1) * PER_PAGE, currentPage * PER_PAGE - 1);
+
+    // Tab filters
+    if (activeTab === 'unanswered') query = query.eq('is_answered', false);
+    if (activeTab === 'answered')   query = query.eq('is_answered', true);
+    if (activeTab === 'mine' && currentUser) query = query.eq('author_id', currentUser.id);
+
+    // Category filter
+    if (activeCat !== 'all') query = query.eq('category', activeCat);
+
+    // Search
+    if (q) query = query.or(`title.ilike.%${q}%,body.ilike.%${q}%`);
+
+    // Sort
+    if (sort === 'votes')   query = query.order('vote_count',  { ascending: false });
+    else if (sort === 'replies') query = query.order('reply_count', { ascending: false });
+    else                    query = query.order('is_pinned', { ascending: false }).order('created_at', { ascending: false });
+
+    const { data, count, error } = await query;
+    if (error) throw error;
+
+    totalCount = count || 0;
+    document.getElementById('showCount').textContent = totalCount;
+    renderPosts(data || []);
+    renderPagination();
+
+  } catch (err) {
+    console.error('Failed to load posts:', err);
+    document.getElementById('postsContainer').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">⚠️</div>
+        <h3>Could not load posts</h3>
+        <p>Check your internet connection or Supabase setup.</p>
+        <button class="btn-retry" onclick="loadPosts()">Try Again</button>
+      </div>`;
+  }
+}
+
+async function loadStats() {
+  try {
+    const [{ count: posts }, { count: replies }, { count: contributors }] = await Promise.all([
+      window.sb.from('posts').select('*', { count:'exact', head:true }).eq('status','active'),
+      window.sb.from('replies').select('*', { count:'exact', head:true }).eq('status','active'),
+      window.sb.from('posts').select('author_id', { count:'exact', head:true }).eq('status','active'),
+    ]);
+    if (posts != null)       document.getElementById('statPosts').textContent    = posts.toLocaleString();
+    if (replies != null)     document.getElementById('statReplies').textContent  = replies.toLocaleString();
+    if (contributors != null) document.getElementById('statMembers').textContent = contributors.toLocaleString();
+
+    // Update tab counts
+    const [{ count: all }, { count: unans }, { count: ans }] = await Promise.all([
+      window.sb.from('posts').select('*', { count:'exact', head:true }).eq('status','active'),
+      window.sb.from('posts').select('*', { count:'exact', head:true }).eq('status','active').eq('is_answered',false),
+      window.sb.from('posts').select('*', { count:'exact', head:true }).eq('status','active').eq('is_answered',true),
+    ]);
+    document.getElementById('tc-all').textContent         = all || 0;
+    document.getElementById('tc-unanswered').textContent  = unans || 0;
+    document.getElementById('tc-answered').textContent    = ans || 0;
+    if (currentUser) {
+      const { count: mine } = await window.sb.from('posts').select('*', { count:'exact', head:true }).eq('author_id', currentUser.id).eq('status','active');
+      document.getElementById('tc-mine').textContent = mine || 0;
+    }
+  } catch (e) { /* silent */ }
+}
+
+async function loadSidebarData() {
+  try {
+    // Category counts
+    const cats = ['career','study','tech','general','news','batch'];
+    const { data: catData } = await window.sb.from('posts').select('category').eq('status','active');
+    if (catData) {
+      const counts = {};
+      catData.forEach(p => { counts[p.category] = (counts[p.category]||0)+1; });
+      document.getElementById('cc-all').textContent = catData.length;
+      cats.forEach(c => { const el = document.getElementById('cc-'+c); if (el) el.textContent = counts[c]||0; });
+    }
+
+    // Top contributors — profiles with most posts
+    const { data: contribs } = await window.sb
+      .from('posts')
+      .select('author_id, author_name, author_batch')
+      .eq('status','active')
+      .limit(100);
+    if (contribs) {
+      const counts = {};
+      const names  = {};
+      const batches= {};
+      contribs.forEach(p => {
+        counts[p.author_id]  = (counts[p.author_id]||0)+1;
+        names[p.author_id]   = p.author_name;
+        batches[p.author_id] = p.author_batch;
+      });
+      const top5 = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5);
+      document.getElementById('topContributors').innerHTML = top5.map(([id, cnt], i) => {
+        const av = AV_COLORS[charSum(names[id]||'') % AV_COLORS.length];
+        return `<div class="contributor-row">
+          <div class="con-rank ${i===0?'gold-rank':''}">${i===0?'🥇':i+1}</div>
+          <div class="con-avatar" style="background:${av.bg};color:${av.tc};">${getInitials(names[id]||'?')}</div>
+          <div class="con-name">${esc(names[id]||'Member')}</div>
+          <div class="con-posts">${cnt} posts</div>
+        </div>`;
+      }).join('') || '<div style="font-size:12px;color:var(--text-muted);">No posts yet</div>';
+    }
+
+    // Trending tags — most used tags
+    const { data: tagData } = await window.sb.from('posts').select('tags').eq('status','active').limit(200);
+    if (tagData) {
+      const tagCounts = {};
+      tagData.forEach(p => { (p.tags||[]).forEach(t => { tagCounts[t] = (tagCounts[t]||0)+1; }); });
+      const top = Object.entries(tagCounts).sort((a,b)=>b[1]-a[1]).slice(0,12).map(([t]) => t);
+      document.getElementById('trendingTags').innerHTML = top.map(t =>
+        `<span class="trend-tag" onclick="searchTag('${esc(t)}')">#${esc(t)}</span>`
+      ).join('') || '<span style="font-size:12px;color:var(--text-muted);">No tags yet</span>';
+    }
+  } catch (e) { /* silent */ }
+}
+
+// ═══════════════════════════════════════════════
+//  RENDER POSTS LIST
+// ═══════════════════════════════════════════════
+function renderPosts(posts) {
+  const container = document.getElementById('postsContainer');
+
+  if (posts.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <h3>No posts found</h3>
+        <p>Be the first to <button onclick="openNewPost()" style="background:none;border:none;color:var(--green);font-weight:600;cursor:pointer;font-family:inherit;font-size:14px;">start a conversation!</button></p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = posts.map(p => {
+    const av       = AV_COLORS[charSum(p.author_name||'') % AV_COLORS.length];
+    const initials = getInitials(p.author_name||'?');
+    const isVoted  = votedPosts.has(p.id);
+    const isMine   = currentUser && p.author_id === currentUser.id;
+    const tags     = Array.isArray(p.tags) ? p.tags : [];
+    const voteCount= parseInt(p.vote_count)||0;
+    const replyCount=parseInt(p.reply_count)||0;
+
+    return `
+    <div class="post-card ${p.is_pinned?'pinned':''}" onclick="openThread(${p.id})">
+      <div class="pc-inner">
+        <div class="pc-top">
+          <div class="pc-vote">
+            <button class="vote-btn ${isVoted?'voted':''}"
+              onclick="event.stopPropagation();votePost(${p.id},this)"
+              title="Upvote">▲</button>
+            <div class="vote-count" id="vc-${p.id}">${voteCount + (isVoted?0:0)}</div>
+            <button class="vote-btn" style="opacity:0.3;" disabled>▼</button>
+          </div>
+          <div class="pc-body">
+            <div class="pc-badges">
+              ${p.is_pinned ? '<span class="pc-badge badge-pinned">📌 Pinned</span>' : ''}
+              ${p.is_answered ? '<span class="pc-badge badge-answered">✅ Answered</span>' : ''}
+              ${isMine ? '<span class="pc-badge badge-mine">👤 My Post</span>' : ''}
+              <span class="pc-cat-tag">${CAT_LABELS[p.category]||p.category||'General'}</span>
+            </div>
+            <div class="pc-title">${esc(p.title)}</div>
+            <div class="pc-preview">${esc(p.body)}</div>
+            ${tags.length ? `<div class="pc-tags">${tags.slice(0,4).map(t=>`<span class="pc-tag">#${esc(t)}</span>`).join('')}</div>` : ''}
+          </div>
+        </div>
+        <div class="pc-footer">
+          <div class="pc-author">
+            <div class="pc-avatar" style="background:${av.bg};color:${av.tc};">${initials}</div>
+            <div>
+              <div class="pc-author-name">${esc(p.author_name||'Member')}</div>
+              <div class="pc-author-meta">${esc(p.author_batch||'')} · ${timeAgo(p.created_at)}</div>
+            </div>
+          </div>
+          <div class="pc-stats">
+            <div class="pc-stat">💬 ${replyCount}</div>
+            <div class="pc-stat">👁 ${parseInt(p.views)||0}</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+//  PAGINATION
+// ═══════════════════════════════════════════════
+function renderPagination() {
+  const total = Math.ceil(totalCount / PER_PAGE);
+  const el    = document.getElementById('pagination');
+  if (total <= 1) { el.innerHTML = ''; return; }
+  let html = `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
+  for (let p = 1; p <= total; p++) {
+    if (p===1||p===total||Math.abs(p-currentPage)<=1)
+      html += `<button class="page-btn ${p===currentPage?'active':''}" onclick="goPage(${p})">${p}</button>`;
+    else if (Math.abs(p-currentPage)===2)
+      html += `<span style="padding:0 4px;line-height:36px;color:var(--text-muted);">…</span>`;
+  }
+  html += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===total?'disabled':''}>›</button>`;
+  el.innerHTML = html;
+}
+
+function goPage(p) {
+  const total = Math.ceil(totalCount / PER_PAGE);
+  if (p < 1 || p > total) return;
+  currentPage = p;
+  loadPosts();
+  window.scrollTo({ top: 280, behavior: 'smooth' });
+}
+
+// ═══════════════════════════════════════════════
+//  THREAD VIEW — load post + replies from Supabase
+// ═══════════════════════════════════════════════
+async function openThread(id) {
+  openPostId = id;
+
+  // Show thread view
+  document.getElementById('postsListView').classList.add('hidden');
+  document.getElementById('threadView').classList.add('active');
+  document.getElementById('threadHeader').innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px;">Loading post…</div>';
+  document.getElementById('repliesContainer').innerHTML = '';
+  document.getElementById('repliesTitle').textContent = 'Replies';
+  window.scrollTo({ top: 200, behavior: 'smooth' });
+
+  try {
+    // Increment view count
+    try {
+      await window.sb.rpc('increment_views', { post_id: id });
+    } catch (e) {
+      // Fallback: direct update
+      const { data: cur } = await window.sb.from('posts').select('views').eq('id',id).single();
+      if (cur) await window.sb.from('posts').update({ views:(cur.views||0)+1 }).eq('id',id);
+    }
+
+    // Fetch full post
+    const { data: post, error: postErr } = await window.sb
+      .from('posts_with_details').select('*').eq('id', id).single();
+    if (postErr) throw postErr;
+
+    // Fetch replies with author info
+    const { data: replies, error: replyErr } = await window.sb
+      .from('replies')
+      .select('*, profiles(full_name, batch, avatar_url)')
+      .eq('post_id', id)
+      .eq('status', 'active')
+      .order('is_best', { ascending: false })
+      .order('created_at', { ascending: true });
+    if (replyErr) throw replyErr;
+
+    renderThread(post, replies || []);
+
+    // Subscribe to new replies in real time
+    if (realtimeChannel) realtimeChannel.unsubscribe();
+    realtimeChannel = window.sb
+      .channel('replies-' + id)
+      .on('postgres_changes', { event:'INSERT', schema:'public', table:'replies', filter:`post_id=eq.${id}` }, async () => {
+        // Refetch replies
+        const { data: fresh } = await window.sb
+          .from('replies').select('*, profiles(full_name, batch, avatar_url)')
+          .eq('post_id', id).eq('status','active')
+          .order('is_best', { ascending:false }).order('created_at', { ascending:true });
+        renderReplies(fresh || []);
+      })
+      .subscribe();
+
+  } catch (err) {
+    console.error('Thread load error:', err);
+    document.getElementById('threadHeader').innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);">Could not load this post. Try again.</div>';
+  }
+}
+
+function renderThread(post, replies) {
+  const av       = AV_COLORS[charSum(post.author_name||'') % AV_COLORS.length];
+  const initials = getInitials(post.author_name||'?');
+  const isVoted  = votedPosts.has(post.id);
+  const tags     = Array.isArray(post.tags) ? post.tags : [];
+  const vCount   = parseInt(post.vote_count)||0;
+
+  document.getElementById('threadHeader').innerHTML = `
+    <div class="th-badges">
+      ${post.is_pinned   ? '<span class="pc-badge badge-pinned">📌 Pinned</span>' : ''}
+      ${post.is_answered ? '<span class="pc-badge badge-answered">✅ Answered</span>' : ''}
+      <span class="pc-cat-tag">${CAT_LABELS[post.category]||post.category||'General'}</span>
+      ${tags.map(t=>`<span class="pc-tag">#${esc(t)}</span>`).join('')}
+    </div>
+    <div class="th-title">${esc(post.title)}</div>
+    <div class="th-body">${esc(post.body)}</div>
+    <div class="th-meta">
+      <div class="th-author">
+        <div class="th-avatar" style="background:${av.bg};color:${av.tc};">${initials}</div>
+        <div>
+          <div class="th-author-name">${esc(post.author_name||'Member')}</div>
+          <div class="th-author-sub">${esc(post.author_batch||'')} · ${timeAgo(post.created_at)}</div>
+        </div>
+      </div>
+      <div class="th-actions">
+        <button class="th-action-btn ${isVoted?'voted':''}" id="threadVoteBtn" onclick="votePost(${post.id}, this, true)">
+          ▲ <span id="threadVoteCount">${vCount}</span> Votes
+        </button>
+        <button class="th-action-btn" onclick="sharePost()">🔗 Share</button>
+      </div>
+    </div>`;
+
+  renderReplies(replies);
+
+  // Composer — show login prompt if not logged in
+  const composerEl = document.getElementById('composerInner');
+  if (!currentUser) {
+    composerEl.innerHTML = `<div class="login-to-reply">Please <a href="login.html?redirect=forum.html">log in</a> to reply to this post.</div>`;
+  } else {
+    composerEl.innerHTML = `
+      <textarea class="composer-textarea" id="replyText" placeholder="Share your knowledge, experience, or advice…"></textarea>
+      <div class="composer-footer">
+        <span class="composer-hint">Be respectful and helpful.</span>
+        <button class="btn-post-reply" id="replySubmitBtn" onclick="submitReply()">Post Reply →</button>
+      </div>`;
+  }
+}
+
+function renderReplies(replies) {
+  document.getElementById('repliesTitle').textContent = `${replies.length} ${replies.length===1?'Reply':'Replies'}`;
+
+  if (replies.length === 0) {
+    document.getElementById('repliesContainer').innerHTML = `
+      <div style="text-align:center;padding:32px;background:white;border:1px solid var(--border);border-radius:12px;color:var(--text-muted);font-size:14px;">
+        No replies yet. Be the first to reply! 👇
+      </div>`;
+    return;
+  }
+
+  document.getElementById('repliesContainer').innerHTML = replies.map(r => {
+    const name     = r.profiles?.full_name || 'Member';
+    const batch    = r.profiles?.batch || '';
+    const av       = AV_COLORS[charSum(name) % AV_COLORS.length];
+    const initials = getInitials(name);
+    const isLiked  = likedReplies.has(r.id);
+
+    return `
+    <div class="reply-card ${r.is_best?'best-answer':''}">
+      <div class="rc-top">
+        <div class="rc-avatar" style="background:${av.bg};color:${av.tc};">${initials}</div>
+        <div style="flex:1;">
+          <div class="rc-header">
+            <span class="rc-name">${esc(name)}</span>
+            <span class="rc-meta-txt">${esc(batch)} · ${timeAgo(r.created_at)}</span>
+            ${r.is_best ? '<span class="best-badge">✅ Best Answer</span>' : ''}
+          </div>
+          <div class="rc-body">${esc(r.body)}</div>
+          <div class="rc-footer">
+            <button class="rc-action ${isLiked?'liked':''}" id="like-${r.id}" onclick="likeReply(${r.id}, this)">
+              ❤ <span id="lc-${r.id}">${r.likes||0}</span>
+            </button>
+            <button class="rc-action" onclick="DPI.toast('Reply quoting coming soon!')">💬 Quote</button>
+            ${currentUser && currentUser.id !== r.author_id ? `<button class="rc-action" onclick="reportReply(${r.id})">⚑ Report</button>` : ''}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function closeThread() {
+  if (realtimeChannel) { realtimeChannel.unsubscribe(); realtimeChannel = null; }
+  document.getElementById('threadView').classList.remove('active');
+  document.getElementById('postsListView').classList.remove('hidden');
+  openPostId = null;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ═══════════════════════════════════════════════
+//  VOTE ON A POST — real Supabase votes table
+// ═══════════════════════════════════════════════
+async function votePost(postId, btn, isThread = false) {
+  if (!currentUser) {
+    DPI.toast('Please log in to vote');
+    setTimeout(() => window.location.href = 'login.html?redirect=forum.html', 1500);
+    return;
+  }
+
+  const isVoted = votedPosts.has(postId);
+
+  try {
+    if (isVoted) {
+      // Remove vote
+      await window.sb.from('votes').delete().eq('post_id', postId).eq('user_id', currentUser.id);
+      votedPosts.delete(postId);
+    } else {
+      // Add vote (unique constraint prevents duplicates)
+      await window.sb.from('votes').insert({ post_id: postId, user_id: currentUser.id });
+      votedPosts.add(postId);
+    }
+
+    // Refresh vote count
+    const { data } = await window.sb
+      .from('votes').select('*', { count:'exact', head:true }).eq('post_id', postId);
+    const newCount = data?.length || 0; // use count from query
+
+    const { count } = await window.sb.from('votes').select('*', { count:'exact', head:true }).eq('post_id', postId);
+
+    // Update UI
+    const countEl = document.getElementById(isThread ? 'threadVoteCount' : `vc-${postId}`);
+    if (countEl) countEl.textContent = count || 0;
+
+    if (isThread) {
+      btn.classList.toggle('voted', !isVoted);
+    }
+
+    DPI.toast(isVoted ? 'Vote removed' : '👍 Upvoted!');
+  } catch (err) {
+    console.error('Vote error:', err);
+    DPI.toast('Something went wrong');
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  LIKE A REPLY — real reply_likes table
+// ═══════════════════════════════════════════════
+async function likeReply(replyId, btn) {
+  if (!currentUser) {
+    DPI.toast('Please log in to like replies');
+    return;
+  }
+
+  const isLiked = likedReplies.has(replyId);
+
+  try {
+    if (isLiked) {
+      await window.sb.from('reply_likes').delete().eq('reply_id', replyId).eq('user_id', currentUser.id);
+      likedReplies.delete(replyId);
+    } else {
+      await window.sb.from('reply_likes').insert({ reply_id: replyId, user_id: currentUser.id });
+      likedReplies.add(replyId);
+    }
+
+    // Refresh like count
+    const { count } = await window.sb.from('reply_likes').select('*', { count:'exact', head:true }).eq('reply_id', replyId);
+    const countEl = document.getElementById(`lc-${replyId}`);
+    if (countEl) countEl.textContent = count || 0;
+
+    btn.classList.toggle('liked', !isLiked);
+
+    // Update replies table likes column
+    await window.sb.from('replies').update({ likes: count || 0 }).eq('id', replyId);
+  } catch (err) {
+    console.error('Like error:', err);
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  SUBMIT REPLY — real Supabase insert
+// ═══════════════════════════════════════════════
+async function submitReply() {
+  if (!currentUser) { DPI.toast('Please log in to reply'); return; }
+
+  const text = document.getElementById('replyText')?.value.trim();
+  if (!text) { DPI.toast('⚠ Please write something before posting'); return; }
+
+  const btn = document.getElementById('replySubmitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="mini-spinner"></span> Posting…';
+
+  try {
+    const { error } = await window.sb.from('replies').insert({
+      post_id:   openPostId,
+      author_id: currentUser.id,
+      body:      text,
+      is_best:   false,
+      status:    'active',
+    });
+
+    if (error) throw error;
+
+    document.getElementById('replyText').value = '';
+    btn.disabled = false;
+    btn.innerHTML = 'Post Reply →';
+    DPI.toast('✅ Reply posted!');
+    // Real-time subscription will update the replies list automatically
+
+  } catch (err) {
+    btn.disabled = false;
+    btn.innerHTML = 'Post Reply →';
+    console.error('Reply error:', err);
+    DPI.toast('Failed to post reply: ' + err.message);
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  NEW POST MODAL — real Supabase insert
+// ═══════════════════════════════════════════════
+function openNewPost() {
+  const notice = document.getElementById('npmLoginNotice');
+  const submitBtn = document.getElementById('npmSubmitBtn');
+  if (!currentUser) {
+    notice.style.display = 'block';
+    submitBtn.disabled = true;
+  } else {
+    notice.style.display = 'none';
+    submitBtn.disabled = false;
+  }
+  document.getElementById('postModalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePostModal(e) { if(e.target===document.getElementById('postModalOverlay')) closePostModalDirect(); }
+function closePostModalDirect() {
+  document.getElementById('postModalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+async function submitNewPost() {
+  if (!currentUser) { DPI.toast('Please log in to post'); return; }
+
+  const title   = document.getElementById('npmTitle').value.trim();
+  const cat     = document.getElementById('npmCat').value;
+  const body    = document.getElementById('npmContent').value.trim();
+  const tagsRaw = document.getElementById('npmTags').value;
+  const tags    = tagsRaw ? tagsRaw.split(',').map(t=>t.trim().toLowerCase().replace(/\s+/g,'-')).filter(Boolean) : [];
+
+  if (!title || !cat || !body) { DPI.toast('⚠ Title, category and content are required'); return; }
+
+  const btn = document.getElementById('npmSubmitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="mini-spinner"></span> Publishing…';
+
+  try {
+    const { data, error } = await window.sb.from('posts').insert({
+      author_id:   currentUser.id,
+      title,
+      body,
+      category:    cat,
+      tags,
+      status:      'active',
+      is_pinned:   false,
+      is_answered: false,
+      views:       0,
+    }).select().single();
+
+    if (error) throw error;
+
+    btn.disabled = false;
+    btn.innerHTML = '📤 Publish Post';
+    closePostModalDirect();
+    DPI.toast('🎉 Your post is live!');
+
+    // Clear form
+    ['npmTitle','npmContent','npmTags'].forEach(id => document.getElementById(id).value='');
+    document.getElementById('npmCat').value='';
+
+    // Reload posts and open the new thread
+    await loadPosts();
+    loadSidebarData();
+    loadStats();
+
+    if (data?.id) openThread(data.id);
+
+  } catch (err) {
+    btn.disabled = false;
+    btn.innerHTML = '📤 Publish Post';
+    console.error('Post error:', err);
+    DPI.toast('Failed to publish: ' + err.message);
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  REALTIME — new posts notify in header
+// ═══════════════════════════════════════════════
+function subscribeToNewPosts() {
+  try {
+    window.sb
+      .channel('forum-posts')
+      .on('postgres_changes', { event:'INSERT', schema:'public', table:'posts' }, () => {
+        // Silently refresh if on all-posts view
+        if (activeTab === 'all' && !openPostId) loadPosts();
+      })
+      .subscribe();
+  } catch (e) { /* realtime not available */ }
+}
+
+// ═══════════════════════════════════════════════
+//  FILTER & SEARCH
+// ═══════════════════════════════════════════════
+function setTab(tab, el) {
+  activeTab = tab;
+  currentPage = 1;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  closeThread();
+  loadPosts();
+}
+
+function setCat(cat, el) {
+  activeCat = cat;
+  currentPage = 1;
+  document.querySelectorAll('.cat-item').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  loadPosts();
+}
+
+function onSearch() {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => { currentPage=1; loadPosts(); }, 350);
+}
+
+function searchTag(tag) {
+  document.getElementById('searchInput').value = tag;
+  currentPage = 1;
+  loadPosts();
+}
+
+function sharePost() {
+  const url = window.location.href.split('?')[0] + '?post=' + openPostId;
+  navigator.clipboard?.writeText(url).catch(()=>{});
+  DPI.toast('🔗 Post link copied!');
+}
+
+function reportReply(id) { DPI.toast('Report submitted. Thank you!'); }
+
+// ═══════════════════════════════════════════════
+//  SKELETONS
+// ═══════════════════════════════════════════════
+function showSkeletons() {
+  document.getElementById('postsContainer').innerHTML = Array(5).fill(0).map(() => `
+    <div class="skel-post">
+      <div class="skeleton skel-line w90"></div>
+      <div class="skeleton skel-line w70"></div>
+      <div class="skeleton skel-line w50"></div>
+      <div class="skeleton skel-line w30"></div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════
+//  UTILITIES
+// ═══════════════════════════════════════════════
+function getInitials(name) {
+  if (!name) return '?';
+  return name.trim().split(/\s+/).slice(0,2).map(n=>n[0].toUpperCase()).join('');
+}
+
+function charSum(str) {
+  return str.split('').reduce((s,c) => s+c.charCodeAt(0), 0);
+}
+
+function timeAgo(iso) {
+  if (!iso) return '—';
+  const diff = Date.now() - new Date(iso);
+  if (diff < 60000)    return 'just now';
+  if (diff < 3600000)  return Math.floor(diff/60000)  + ' min ago';
+  if (diff < 86400000) return Math.floor(diff/3600000) + ' hr ago';
+  if (diff < 604800000)return Math.floor(diff/86400000)+ ' days ago';
+  return new Date(iso).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+}
+
+function esc(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+
+function DPI.toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+document.addEventListener('keydown', e => { if (e.key==='Escape') closePostModalDirect(); });
+</script>
+<div id="dpiToast"></div>
+</body>
+</html>

@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Events — DPI Society</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<!-- ✅ SUPABASE SDK -->
+<script src="config.js"></script>
+<style>
+  :root {
+    --green:#006A4E; --green-light:#00875F; --green-pale:#E8F5F0; --green-mid:#00A36C;
+    --red:#C8102E; --red-pale:#FFF0F1;
+    --gold:#F4A600; --gold-pale:#FFF8E6;
+    --blue:#1A4FA0; --blue-pale:#EEF3FF;
+    --purple:#6B35C8; --purple-pale:#F3EEFF;
+    --dark:#0D1A13; --text:#1A2E22; --text-muted:#5A7A68;
+    --border:rgba(0,106,78,0.13); --white:#FFFFFF; --off-white:#F7FAF8;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--off-white);color:var(--text);}
+
+  /* NAV */
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,0.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);height:64px;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;}
+  .nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+  .nav-logo{width:38px;height:38px;border-radius:9px;background:var(--green);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:15px;font-weight:900;color:white;}
+  .nav-brand-text strong{display:block;font-size:14px;font-weight:600;color:var(--green);}
+  .nav-brand-text span{font-size:11px;color:var(--text-muted);}
+  .nav-links{display:flex;gap:4px;list-style:none;}
+  .nav-links a{font-size:13px;font-weight:500;color:var(--text-muted);text-decoration:none;padding:6px 12px;border-radius:6px;transition:all 0.2s;}
+  .nav-links a:hover,.nav-links a.active{color:var(--green);background:var(--green-pale);}
+  .nav-actions{display:flex;gap:8px;align-items:center;}
+  .btn-nav-outline{font-size:13px;font-weight:500;padding:7px 16px;border-radius:7px;border:1.5px solid var(--green);color:var(--green);background:transparent;cursor:pointer;text-decoration:none;transition:all 0.2s;}
+  .btn-nav-outline:hover{background:var(--green-pale);}
+  .btn-nav-primary{font-size:13px;font-weight:500;padding:7px 16px;border-radius:7px;border:none;background:var(--green);color:white;cursor:pointer;text-decoration:none;transition:all 0.2s;}
+  .btn-nav-primary:hover{background:var(--green-light);}
+  .nav-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:var(--green-pale);color:var(--green);cursor:pointer;border:2px solid var(--green);}
+  .nav-avatar:hover{background:var(--green);color:white;}
+
+  /* PAGE HEADER */
+  .page-header{background:var(--dark);padding:80px 2rem 44px;position:relative;overflow:hidden;}
+  .ph-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 90% at 90% 50%,rgba(0,106,78,0.3) 0%,transparent 65%),radial-gradient(ellipse 40% 60% at 10% 80%,rgba(200,16,46,0.12) 0%,transparent 60%),radial-gradient(ellipse 50% 50% at 50% 0%,rgba(244,166,0,0.08) 0%,transparent 60%);}
+  .ph-inner{position:relative;z-index:2;max-width:1200px;margin:0 auto;}
+  .ph-label{font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-mid);margin-bottom:10px;}
+  .ph-title{font-family:'Playfair Display',serif;font-size:36px;font-weight:900;color:white;margin-bottom:10px;}
+  .ph-sub{font-size:15px;color:rgba(255,255,255,0.5);margin-bottom:28px;}
+  .cat-tabs{display:flex;gap:8px;flex-wrap:wrap;}
+  .cat-tab{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:100px;cursor:pointer;font-size:13px;font-weight:500;transition:all 0.2s;border:1.5px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);background:rgba(255,255,255,0.06);}
+  .cat-tab:hover{border-color:rgba(255,255,255,0.3);color:white;background:rgba(255,255,255,0.1);}
+  .cat-tab.active{background:var(--green);border-color:var(--green);color:white;}
+  .cat-tab .cat-count{background:rgba(255,255,255,0.2);border-radius:100px;padding:1px 7px;font-size:11px;font-weight:600;}
+  .cat-tab.active .cat-count{background:rgba(255,255,255,0.25);}
+
+  /* FEATURED EVENT */
+  .featured-section{max-width:1200px;margin:0 auto;padding:28px 2rem 0;}
+  .featured-label{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--green);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+  .featured-label::after{content:'';flex:1;height:1px;background:var(--border);}
+  .featured-card{background:white;border:1px solid var(--border);border-radius:20px;overflow:hidden;display:grid;grid-template-columns:340px 1fr;margin-bottom:8px;transition:box-shadow 0.25s;}
+  .featured-card:hover{box-shadow:0 8px 32px rgba(0,106,78,0.1);}
+  .featured-banner{background:var(--dark);position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:28px;}
+  .fb-bg{position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,106,78,0.9) 0%,rgba(0,50,30,0.95) 100%);}
+  .fb-pattern{position:absolute;inset:0;opacity:0.06;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,1) 0,rgba(255,255,255,1) 1px,transparent 0,transparent 50%);background-size:20px 20px;}
+  .fb-top{position:relative;z-index:2;}
+  .fb-type-badge{display:inline-block;background:var(--gold);color:var(--dark);font-size:10px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;padding:4px 12px;border-radius:6px;margin-bottom:18px;}
+  .fb-date-big{font-family:'Playfair Display',serif;font-size:56px;font-weight:900;color:white;line-height:1;}
+  .fb-month{font-size:18px;color:rgba(255,255,255,0.7);margin-top:4px;}
+  .fb-bottom{position:relative;z-index:2;}
+  .fb-countdown{background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px 14px;}
+  .fb-countdown-label{font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;}
+  .fb-countdown-timer{display:flex;gap:8px;}
+  .fct-unit{text-align:center;}
+  .fct-num{font-size:22px;font-weight:700;color:white;}
+  .fct-label{font-size:10px;color:rgba(255,255,255,0.4);}
+  .fct-sep{font-size:20px;color:rgba(255,255,255,0.3);padding-top:4px;}
+  .featured-body{padding:32px;display:flex;flex-direction:column;justify-content:space-between;}
+  .fb-event-type{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--green);margin-bottom:10px;}
+  .fb-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:var(--dark);margin-bottom:12px;line-height:1.2;}
+  .fb-desc{font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:24px;}
+  .fb-meta{display:flex;flex-direction:column;gap:8px;margin-bottom:24px;}
+  .fb-meta-item{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-muted);}
+  .fb-meta-icon{width:28px;height:28px;border-radius:7px;background:var(--green-pale);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+  .fb-meta-item strong{color:var(--dark);}
+  .fb-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .btn-rsvp{padding:13px 28px;border-radius:10px;background:var(--green);color:white;border:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:8px;}
+  .btn-rsvp:hover{background:var(--green-light);transform:translateY(-1px);}
+  .btn-rsvp.rsvped{background:#1E8C5A;}
+  .btn-rsvp:disabled{opacity:0.55;cursor:not-allowed;transform:none;}
+  .btn-share{padding:13px 20px;border-radius:10px;background:white;color:var(--text-muted);border:1.5px solid var(--border);font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;transition:all 0.2s;}
+  .btn-share:hover{border-color:var(--green);color:var(--green);}
+  .rsvp-loading{opacity:0.6;pointer-events:none;}
+
+  /* CALENDAR STRIP */
+  .calendar-strip-wrap{background:white;border-bottom:1px solid var(--border);padding:16px 0 8px;}
+  .calendar-strip{max-width:1200px;margin:0 auto;padding:0 2rem;display:flex;gap:8px;overflow-x:auto;}
+  .calendar-strip::-webkit-scrollbar{height:4px;}
+  .calendar-strip::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+  .cs-month{flex-shrink:0;background:white;border:1.5px solid var(--border);border-radius:12px;padding:10px 16px;text-align:center;cursor:pointer;transition:all 0.2s;}
+  .cs-month:hover{border-color:var(--green);}
+  .cs-month.active{background:var(--green);border-color:var(--green);}
+  .cs-month-name{font-size:12px;font-weight:600;color:var(--text-muted);}
+  .cs-month.active .cs-month-name{color:white;}
+  .cs-month-count{font-size:18px;font-weight:700;color:var(--dark);margin-top:2px;}
+  .cs-month.active .cs-month-count{color:white;}
+  .cs-month-label{font-size:10px;color:var(--text-muted);}
+  .cs-month.active .cs-month-label{color:rgba(255,255,255,0.7);}
+
+  /* EVENTS SECTION */
+  .events-section{max-width:1200px;margin:0 auto;padding:32px 2rem 60px;}
+  .section-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+  .section-heading{font-family:'Playfair Display',serif;font-size:24px;font-weight:900;color:var(--dark);}
+  .search-sort{display:flex;gap:10px;align-items:center;}
+  .ev-search-wrap{position:relative;}
+  .ev-search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none;}
+  .ev-search{padding:9px 14px 9px 36px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:white;outline:none;transition:all 0.2s;width:220px;}
+  .ev-search:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(0,106,78,0.07);}
+  .sort-wrap{position:relative;}
+  .sort-wrap::after{content:'▾';position:absolute;right:9px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text-muted);font-size:12px;}
+  .ev-sort{padding:9px 28px 9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:white;outline:none;cursor:pointer;appearance:none;}
+
+  /* EVENT CARDS */
+  .events-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+  .event-card{background:white;border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:all 0.25s;cursor:pointer;position:relative;}
+  .event-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,0.08);}
+  .ec-banner{height:110px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;padding:0 20px;}
+  .ec-banner-reunion{background:linear-gradient(135deg,#004A36,#006A4E);}
+  .ec-banner-seminar{background:linear-gradient(135deg,#0D3B8C,#1A4FA0);}
+  .ec-banner-workshop{background:linear-gradient(135deg,#7B3F00,#B87800);}
+  .ec-banner-sports{background:linear-gradient(135deg,#7A0020,#C8102E);}
+  .ec-banner-cultural{background:linear-gradient(135deg,#4A1A7A,#6B35C8);}
+  .ec-banner-career{background:linear-gradient(135deg,#0D4A4A,#0D7A6A);}
+  .ec-banner-general{background:linear-gradient(135deg,#1A2E22,#2D4A38);}
+  .ec-banner-pattern{position:absolute;inset:0;opacity:0.05;background-image:radial-gradient(circle,rgba(255,255,255,0.9) 1px,transparent 1px);background-size:18px 18px;}
+  .ec-date-box{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:10px;padding:10px 14px;text-align:center;position:relative;z-index:2;backdrop-filter:blur(4px);}
+  .ec-date-day{font-size:28px;font-weight:800;color:white;line-height:1;}
+  .ec-date-mon{font-size:11px;color:rgba(255,255,255,0.8);text-transform:uppercase;letter-spacing:0.07em;margin-top:2px;}
+  .ec-type-badge{position:relative;z-index:2;font-size:10px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;padding:5px 11px;border-radius:100px;background:rgba(255,255,255,0.2);color:white;border:1px solid rgba(255,255,255,0.3);}
+  .ec-past-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:center;z-index:3;}
+  .ec-past-badge{background:rgba(0,0,0,0.6);color:rgba(255,255,255,0.8);font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:6px 14px;border-radius:6px;border:1px solid rgba(255,255,255,0.2);}
+  .ec-body{padding:18px;}
+  .ec-title{font-size:15px;font-weight:600;color:var(--dark);margin-bottom:6px;line-height:1.3;}
+  .ec-desc{font-size:12px;color:var(--text-muted);line-height:1.6;margin-bottom:14px;}
+  .ec-info{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+  .ec-info-row{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-muted);}
+  .ec-info-icon{font-size:13px;width:18px;text-align:center;}
+  .ec-footer{padding:12px 18px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+  .ec-attendees{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted);}
+  .ec-attendees-dots{display:flex;}
+  .ec-dot{width:20px;height:20px;border-radius:50%;border:1.5px solid white;margin-left:-6px;font-size:8px;display:flex;align-items:center;justify-content:center;font-weight:700;}
+  .ec-dot:first-child{margin-left:0;}
+  .btn-ec{font-size:12px;font-weight:600;padding:7px 14px;border-radius:7px;cursor:pointer;transition:all 0.2s;font-family:'DM Sans',sans-serif;border:none;}
+  .btn-ec-rsvp{background:var(--green);color:white;}
+  .btn-ec-rsvp:hover{background:var(--green-light);}
+  .btn-ec-rsvp.rsvped{background:#1E8C5A;}
+  .btn-ec-rsvp:disabled{opacity:0.55;cursor:not-allowed;}
+  .btn-ec-past{background:var(--off-white);color:var(--text-muted);border:1px solid var(--border);cursor:default;}
+  .btn-ec-full{background:var(--red-pale);color:var(--red);border:1px solid rgba(200,16,46,0.2);cursor:default;}
+
+  /* Skeleton */
+  .skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:8px;}
+  @keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+  .skel-card{background:white;border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+  .skel-banner{height:110px;}
+  .skel-body{padding:18px;display:flex;flex-direction:column;gap:10px;}
+  .skel-line{height:12px;border-radius:4px;}
+  .skel-line.w80{width:80%;}.skel-line.w60{width:60%;}.skel-line.w40{width:40%;}
+
+  /* No/Error state */
+  .no-events{grid-column:1/-1;text-align:center;padding:60px 20px;}
+  .no-events .ne-icon{font-size:44px;margin-bottom:12px;}
+  .no-events h3{font-size:18px;font-weight:600;color:var(--dark);margin-bottom:8px;}
+  .no-events p{font-size:14px;color:var(--text-muted);}
+  .btn-retry{padding:10px 24px;border-radius:9px;background:var(--green);color:white;border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background 0.2s;margin-top:16px;}
+  .btn-retry:hover{background:var(--green-light);}
+
+  /* EVENT MODAL */
+  .modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(13,26,19,0.65);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+  .modal-overlay.open{opacity:1;pointer-events:all;}
+  .event-modal{background:white;border-radius:20px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;transform:scale(0.96) translateY(10px);transition:transform 0.25s;position:relative;}
+  .modal-overlay.open .event-modal{transform:scale(1) translateY(0);}
+  .modal-close{position:absolute;top:14px;right:14px;z-index:10;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,0.2);border:none;cursor:pointer;font-size:15px;color:white;display:flex;align-items:center;justify-content:center;transition:background 0.2s;}
+  .modal-close:hover{background:rgba(0,0,0,0.4);}
+  .em-header{height:180px;position:relative;overflow:hidden;display:flex;align-items:flex-end;padding:24px;}
+  .em-header-bg{position:absolute;inset:0;}
+  .em-header-pattern{position:absolute;inset:0;opacity:0.05;background-image:radial-gradient(circle,rgba(255,255,255,0.9) 1px,transparent 1px);background-size:22px 22px;}
+  .em-date-badge{position:relative;z-index:2;}
+  .em-date-big{font-family:'Playfair Display',serif;font-size:42px;font-weight:900;color:white;line-height:1;}
+  .em-date-rest{font-size:16px;color:rgba(255,255,255,0.7);margin-top:4px;}
+  .em-body{padding:24px 28px;}
+  .em-type{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--green);margin-bottom:8px;}
+  .em-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--dark);margin-bottom:12px;}
+  .em-desc{font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:20px;}
+  .em-details{display:flex;flex-direction:column;gap:10px;margin-bottom:22px;}
+  .em-detail-row{display:flex;align-items:center;gap:12px;font-size:14px;}
+  .em-detail-icon{width:36px;height:36px;border-radius:9px;background:var(--green-pale);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+  .em-detail-label{font-size:11px;color:var(--text-muted);}
+  .em-detail-value{font-size:13px;font-weight:500;color:var(--dark);}
+  .em-rsvp-section{background:var(--off-white);border-radius:12px;padding:16px;margin-bottom:16px;}
+  .em-rsvp-bar{height:6px;border-radius:6px;background:var(--border);overflow:hidden;margin:8px 0;}
+  .em-rsvp-fill{height:100%;border-radius:6px;background:var(--green);transition:width 0.5s;}
+  .em-rsvp-labels{display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);}
+  .btn-rsvp-modal{width:100%;padding:14px;border-radius:10px;background:var(--green);color:white;border:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.2s;}
+  .btn-rsvp-modal:hover{background:var(--green-light);}
+  .btn-rsvp-modal.rsvped{background:#1E8C5A;}
+  .btn-rsvp-modal:disabled{opacity:0.55;cursor:not-allowed;}
+  .btn-login-prompt{width:100%;padding:14px;border-radius:10px;background:var(--green);color:white;border:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.2s;}
+  .btn-login-prompt:hover{background:var(--green-light);}
+
+  /* Toast */
+  .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--dark);color:white;font-size:14px;font-weight:500;padding:12px 22px;border-radius:100px;opacity:0;transition:all 0.3s;pointer-events:none;z-index:300;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .mini-spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;vertical-align:middle;margin-right:4px;}
+
+  @media(max-width:900px){
+    .featured-card{grid-template-columns:1fr;}
+    .featured-banner{min-height:200px;}
+    .events-grid{grid-template-columns:repeat(2,1fr);}
+    nav .nav-links{display:none;}
+  }
+  @media(max-width:580px){
+    .events-grid{grid-template-columns:1fr;}
+    .featured-body{padding:20px;}
+    .em-body{padding:20px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-brand">
+    <div class="nav-logo">DPI</div>
+    <div class="nav-brand-text">
+      <strong>DPI Society</strong>
+      <span>Alumni Network</span>
+    </div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="members.html">Members</a></li>
+    <li><a href="events.html" class="active">Events</a></li>
+    <li><a href="resources.html">Resources</a></li>
+    <li><a href="forum.html">Forum</a></li>
+  </ul>
+  <div class="nav-actions" id="navActions">
+    <a href="login.html" class="btn-nav-outline">Log In</a>
+    <a href="register.html" class="btn-nav-primary">Join Free</a>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="ph-bg"></div>
+  <div class="ph-inner">
+    <div class="ph-label">📅 DPI Society</div>
+    <h1 class="ph-title">Events & Reunions</h1>
+    <p class="ph-sub">Stay connected — attend alumni gatherings, seminars, workshops and more</p>
+    <div class="cat-tabs" id="catTabs">
+      <div class="cat-tab active" onclick="filterCat('all',this)">All Events <span class="cat-count" id="cnt-all">—</span></div>
+      <div class="cat-tab" onclick="filterCat('reunion',this)">🤝 Reunion <span class="cat-count" id="cnt-reunion">—</span></div>
+      <div class="cat-tab" onclick="filterCat('seminar',this)">🎤 Seminar <span class="cat-count" id="cnt-seminar">—</span></div>
+      <div class="cat-tab" onclick="filterCat('workshop',this)">🔧 Workshop <span class="cat-count" id="cnt-workshop">—</span></div>
+      <div class="cat-tab" onclick="filterCat('sports',this)">⚽ Sports <span class="cat-count" id="cnt-sports">—</span></div>
+      <div class="cat-tab" onclick="filterCat('cultural',this)">🎭 Cultural <span class="cat-count" id="cnt-cultural">—</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- CALENDAR STRIP -->
+<div class="calendar-strip-wrap">
+  <div class="calendar-strip" id="calendarStrip"></div>
+</div>
+
+<!-- FEATURED EVENT -->
+<div class="featured-section">
+  <div class="featured-label">⭐ Next Major Event</div>
+  <div id="featuredCard"></div>
+</div>
+
+<!-- EVENTS GRID -->
+<div class="events-section">
+  <div class="section-row">
+    <div class="section-heading" id="sectionHeading">Upcoming Events</div>
+    <div class="search-sort">
+      <div class="ev-search-wrap">
+        <span class="ev-search-icon">🔍</span>
+        <input class="ev-search" type="text" id="evSearch" placeholder="Search events…" oninput="onEvSearch()">
+      </div>
+      <div class="sort-wrap">
+        <select class="ev-sort" id="evSort" onchange="renderGrid()">
+          <option value="date-asc">Date: Soonest</option>
+          <option value="date-desc">Date: Latest</option>
+          <option value="popular">Most RSVPs</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="events-grid" id="eventsGrid"></div>
+</div>
+
+<!-- EVENT DETAIL MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="event-modal" id="eventModal">
+    <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    <div class="em-header" id="emHeader">
+      <div class="em-header-bg" id="emHeaderBg"></div>
+      <div class="em-header-pattern"></div>
+      <div class="em-date-badge">
+        <div class="em-date-big" id="emDay"></div>
+        <div class="em-date-rest" id="emMonthYear"></div>
+      </div>
+    </div>
+    <div class="em-body">
+      <div class="em-type" id="emType"></div>
+      <div class="em-title" id="emTitle"></div>
+      <div class="em-desc" id="emDesc"></div>
+      <div class="em-details" id="emDetails"></div>
+      <div class="em-rsvp-section" id="emRsvpSection">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <span style="font-size:13px;font-weight:600;color:var(--dark);">Attendance</span>
+          <span style="font-size:12px;color:var(--text-muted);" id="emRsvpCount"></span>
+        </div>
+        <div class="em-rsvp-bar"><div class="em-rsvp-fill" id="emRsvpFill"></div></div>
+        <div class="em-rsvp-labels"><span id="emRsvpLeft"></span><span id="emRsvpRight"></span></div>
+      </div>
+      <button class="btn-rsvp-modal" id="emRsvpBtn"></button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+let allEvents      = [];   // raw data from Supabase
+let userRsvpSet    = new Set(); // event IDs the current user has RSVPed to
+let currentUser    = null;
+let currentProfile = null;
+let activeCategory = 'all';
+let openEventId    = null;
+let searchTimeout  = null;
+let realtimeChannel= null;
+
+// ── COLOUR MAP for event types ──
+const TYPE_COLORS = {
+  reunion:  { banner:'ec-banner-reunion',  grad:'linear-gradient(135deg,#004A36,#006A4E)' },
+  seminar:  { banner:'ec-banner-seminar',  grad:'linear-gradient(135deg,#0D3B8C,#1A4FA0)' },
+  workshop: { banner:'ec-banner-workshop', grad:'linear-gradient(135deg,#7B3F00,#B87800)' },
+  sports:   { banner:'ec-banner-sports',   grad:'linear-gradient(135deg,#7A0020,#C8102E)' },
+  cultural: { banner:'ec-banner-cultural', grad:'linear-gradient(135deg,#4A1A7A,#6B35C8)' },
+  career:   { banner:'ec-banner-career',   grad:'linear-gradient(135deg,#0D4A4A,#0D7A6A)' },
+  general:  { banner:'ec-banner-general',  grad:'linear-gradient(135deg,#1A2E22,#2D4A38)' },
+};
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+window.addEventListener('load', async () => {
+  await DPI.initSession(); DPI.initNav(); DPI.toast = (m) => DPI.toast(m);
+  await loadEvents();
+  subscribeToRsvpUpdates();
+});
+
+// ═══════════════════════════════════════════════
+//  SESSION
+// ═══════════════════════════════════════════════
+ } = await window.sb.auth.getSession();
+    if (!session) return;
+    currentUser = session.user;
+
+    const { data: profile } = await window.sb
+      .from('profiles')
+      .select('full_name, avatar_url, user_type')
+      .eq('id', currentUser.id)
+      .single();
+    currentProfile = profile;
+
+    // Update nav
+    const nav = document.getElementById('navActions');
+    const initials = profile?.full_name
+      ? profile.full_name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()
+      : '?';
+    nav.innerHTML = profile?.avatar_url
+      ? `<div class="nav-avatar" title="${profile.full_name}"><img src="${escHtml(profile.avatar_url)}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" alt=""></div>`
+      : `<div class="nav-avatar" title="${profile?.full_name || ''}">${initials}</div>`;
+    if (profile?.user_type === 'admin') {
+      nav.innerHTML += `<a href="admin.html" class="btn-nav-primary" style="margin-left:8px;">⚙ Admin</a>`;
+    }
+
+    // Load user's existing RSVPs
+    await loadUserRsvps();
+  } catch (e) { /* not configured yet */ }
+}
+
+async function loadUserRsvps() {
+  if (!currentUser) return;
+  try {
+    const { data } = await window.sb
+      .from('rsvps')
+      .select('event_id')
+      .eq('user_id', currentUser.id);
+    userRsvpSet = new Set((data || []).map(r => r.event_id));
+  } catch (e) { /* silent */ }
+}
+
+// ═══════════════════════════════════════════════
+//  LOAD EVENTS FROM SUPABASE
+// ═══════════════════════════════════════════════
+async function loadEvents() {
+  showSkeletons();
+  try {
+    // Fetch events joined with RSVP count via the view we created
+    const { data, error } = await window.sb
+      .from('events_with_rsvp_count')
+      .select('*')
+      .order('event_date', { ascending: true });
+
+    if (error) throw error;
+
+    allEvents = (data || []).map(e => ({
+      ...e,
+      rsvp_count: parseInt(e.rsvp_count) || 0,
+    }));
+
+    updateCategoryCounters();
+    renderCalendarStrip();
+    renderFeatured();
+    renderGrid();
+
+  } catch (err) {
+    console.error('Failed to load events:', err);
+    showEventsError();
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  REALTIME — subscribe to RSVP inserts/deletes
+//  so counts update live across all open tabs
+// ═══════════════════════════════════════════════
+function subscribeToRsvpUpdates() {
+  try {
+    realtimeChannel = window.sb
+      .channel('rsvps-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'rsvps' }, async (payload) => {
+        // Refetch the affected event's count and update locally
+        const eventId = payload.new?.event_id || payload.old?.event_id;
+        if (!eventId) return;
+
+        const { data } = await window.sb
+          .from('events_with_rsvp_count')
+          .select('id, rsvp_count')
+          .eq('id', eventId)
+          .single();
+
+        if (data) {
+          const ev = allEvents.find(e => e.id === eventId);
+          if (ev) {
+            ev.rsvp_count = parseInt(data.rsvp_count) || 0;
+            renderGrid();
+            // If modal is open for this event, refresh it
+            if (openEventId === eventId) refreshModal(eventId);
+          }
+        }
+      })
+      .subscribe();
+  } catch (e) { /* realtime not available */ }
+}
+
+// ═══════════════════════════════════════════════
+//  CATEGORY COUNTERS
+// ═══════════════════════════════════════════════
+function updateCategoryCounters() {
+  const types = ['reunion','seminar','workshop','sports','cultural'];
+  document.getElementById('cnt-all').textContent = allEvents.length;
+  types.forEach(t => {
+    const el = document.getElementById('cnt-' + t);
+    if (el) el.textContent = allEvents.filter(e => e.event_type === t).length;
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  CALENDAR STRIP
+// ═══════════════════════════════════════════════
+function renderCalendarStrip() {
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const year = new Date().getFullYear();
+  const counts = Array(12).fill(0);
+  allEvents.filter(e => e.status === 'upcoming').forEach(e => {
+    const m = new Date(e.event_date).getMonth();
+    counts[m]++;
+  });
+  document.getElementById('calendarStrip').innerHTML = months.map((m, i) => `
+    <div class="cs-month ${counts[i] > 0 ? '' : 'dim'}">
+      <div class="cs-month-name">${m} ${year}</div>
+      <div class="cs-month-count">${counts[i]}</div>
+      <div class="cs-month-label">${counts[i] === 1 ? 'event' : 'events'}</div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════
+//  FEATURED EVENT (next upcoming featured or soonest)
+// ═══════════════════════════════════════════════
+function renderFeatured() {
+  const featured = allEvents.find(e => e.is_featured && e.status === 'upcoming')
+    || allEvents.find(e => e.status === 'upcoming');
+
+  const card = document.getElementById('featuredCard');
+  if (!featured) { card.innerHTML = ''; return; }
+
+  const d     = new Date(featured.event_date);
+  const day   = d.getDate();
+  const month = d.toLocaleDateString('en-GB', { month: 'long' });
+  const year  = d.getFullYear();
+  const cd    = getCountdown(d);
+  const isRsvped = userRsvpSet.has(featured.id);
+  const isFull   = featured.rsvp_count >= featured.capacity;
+  const isPast   = featured.status === 'past';
+
+  card.innerHTML = `
+    <div class="featured-card">
+      <div class="featured-banner">
+        <div class="fb-bg"></div>
+        <div class="fb-pattern"></div>
+        <div class="fb-top">
+          <div class="fb-type-badge">${(featured.event_type||'event').toUpperCase()}</div>
+          <div class="fb-date-big">${day}</div>
+          <div class="fb-month">${month} ${year}</div>
+        </div>
+        <div class="fb-bottom">
+          ${cd ? `<div class="fb-countdown">
+            <div class="fb-countdown-label">Countdown</div>
+            <div class="fb-countdown-timer">
+              <div class="fct-unit"><div class="fct-num" id="fcd-d">${cd.days}</div><div class="fct-label">Days</div></div>
+              <div class="fct-sep">:</div>
+              <div class="fct-unit"><div class="fct-num" id="fcd-h">${String(cd.hours).padStart(2,'0')}</div><div class="fct-label">Hrs</div></div>
+              <div class="fct-sep">:</div>
+              <div class="fct-unit"><div class="fct-num" id="fcd-m">${String(cd.mins).padStart(2,'0')}</div><div class="fct-label">Min</div></div>
+            </div>
+          </div>` : ''}
+        </div>
+      </div>
+      <div class="featured-body">
+        <div>
+          <div class="fb-event-type">🌟 ${cap(featured.event_type || 'Event')}</div>
+          <div class="fb-title">${escHtml(featured.title)}</div>
+          <div class="fb-desc">${escHtml(featured.description || '')}</div>
+          <div class="fb-meta">
+            <div class="fb-meta-item"><div class="fb-meta-icon">📅</div><span><strong>${day} ${month} ${year}</strong>${featured.event_time ? ' · ' + featured.event_time : ''}</span></div>
+            ${featured.venue ? `<div class="fb-meta-item"><div class="fb-meta-icon">📍</div><span>${escHtml(featured.venue)}</span></div>` : ''}
+            <div class="fb-meta-item"><div class="fb-meta-icon">🎟</div><span><strong>${featured.rsvp_count}</strong> attending · ${featured.capacity - featured.rsvp_count} spots left</span></div>
+          </div>
+        </div>
+        <div class="fb-actions">
+          ${buildRsvpBtn(featured, isRsvped, isFull, isPast, 'handleFeaturedRsvp')}
+          <button class="btn-share" onclick="openModalEv(${featured.id})">View Details</button>
+        </div>
+      </div>
+    </div>`;
+
+  // Start live countdown ticker
+  if (cd) {
+    setInterval(() => {
+      const c = getCountdown(d);
+      if (!c) return;
+      const dd = document.getElementById('fcd-d');
+      const dh = document.getElementById('fcd-h');
+      const dm = document.getElementById('fcd-m');
+      if (dd) dd.textContent = c.days;
+      if (dh) dh.textContent = String(c.hours).padStart(2,'0');
+      if (dm) dm.textContent = String(c.mins).padStart(2,'0');
+    }, 30000);
+  }
+}
+
+async function handleFeaturedRsvp(id) {
+  await toggleRsvp(id);
+  renderFeatured();
+  renderGrid();
+}
+
+// ═══════════════════════════════════════════════
+//  EVENTS GRID
+// ═══════════════════════════════════════════════
+function renderGrid() {
+  const q    = document.getElementById('evSearch').value.trim().toLowerCase();
+  const sort = document.getElementById('evSort').value;
+
+  let upcoming = allEvents.filter(e => e.status === 'upcoming');
+  let past     = allEvents.filter(e => e.status === 'past');
+
+  // Category filter
+  if (activeCategory !== 'all') {
+    upcoming = upcoming.filter(e => e.event_type === activeCategory);
+    past     = past.filter(e => e.event_type === activeCategory);
+  }
+
+  // Search filter
+  if (q) {
+    const matches = e => (e.title||'').toLowerCase().includes(q) || (e.event_type||'').includes(q) || (e.venue||'').toLowerCase().includes(q) || (e.description||'').toLowerCase().includes(q);
+    upcoming = upcoming.filter(matches);
+    past     = past.filter(matches);
+  }
+
+  // Sort upcoming
+  if (sort === 'date-asc')  upcoming.sort((a,b) => new Date(a.event_date) - new Date(b.event_date));
+  else if (sort === 'date-desc') upcoming.sort((a,b) => new Date(b.event_date) - new Date(a.event_date));
+  else if (sort === 'popular') { upcoming.sort((a,b) => b.rsvp_count - a.rsvp_count); past.sort((a,b) => b.rsvp_count - a.rsvp_count); }
+
+  const allShown = [...upcoming, ...past];
+  document.getElementById('sectionHeading').textContent = `${activeCategory !== 'all' ? cap(activeCategory) + ' ' : ''}Events (${allShown.length})`;
+
+  if (allShown.length === 0) {
+    document.getElementById('eventsGrid').innerHTML = `<div class="no-events"><div class="ne-icon">📭</div><h3>No events found</h3><p>Try a different category or search.</p></div>`;
+    return;
+  }
+
+  document.getElementById('eventsGrid').innerHTML = allShown.map(ev => {
+    const d       = new Date(ev.event_date);
+    const day     = d.getDate();
+    const mon     = d.toLocaleDateString('en-GB', { month: 'short' }).toUpperCase();
+    const tc      = TYPE_COLORS[ev.event_type] || TYPE_COLORS.general;
+    const isPast  = ev.status === 'past';
+    const isFull  = ev.rsvp_count >= ev.capacity && !userRsvpSet.has(ev.id);
+    const isRsvped= userRsvpSet.has(ev.id);
+
+    return `
+    <div class="event-card" onclick="openModalEv(${ev.id})">
+      <div class="ec-banner ${tc.banner}">
+        <div class="ec-banner-pattern"></div>
+        <div class="ec-date-box">
+          <div class="ec-date-day">${day}</div>
+          <div class="ec-date-mon">${mon}</div>
+        </div>
+        <div class="ec-type-badge">${ev.event_type || 'event'}</div>
+        ${isPast ? `<div class="ec-past-overlay"><div class="ec-past-badge">Event Ended</div></div>` : ''}
+      </div>
+      <div class="ec-body">
+        <div class="ec-title">${escHtml(ev.title)}</div>
+        <div class="ec-desc">${escHtml((ev.description||'').substring(0,90))}…</div>
+        <div class="ec-info">
+          ${ev.event_time ? `<div class="ec-info-row"><span class="ec-info-icon">🕐</span>${escHtml(ev.event_time)}</div>` : ''}
+          ${ev.venue      ? `<div class="ec-info-row"><span class="ec-info-icon">📍</span>${escHtml(ev.venue)}</div>` : ''}
+        </div>
+      </div>
+      <div class="ec-footer">
+        <div class="ec-attendees">
+          <div class="ec-attendees-dots">
+            ${['#D1F5E8','#FDEEF0','#FFF3D4'].map(bg => `<div class="ec-dot" style="background:${bg};"></div>`).join('')}
+          </div>
+          <span>${ev.rsvp_count} going</span>
+        </div>
+        ${isPast
+          ? `<button class="btn-ec btn-ec-past" disabled>Ended</button>`
+          : isFull
+            ? `<button class="btn-ec btn-ec-full" disabled>Full</button>`
+            : `<button class="btn-ec btn-ec-rsvp ${isRsvped ? 'rsvped' : ''}" id="qrsvp-${ev.id}" onclick="event.stopPropagation();quickRsvp(${ev.id},this)">${isRsvped ? '✓ Going' : 'RSVP'}</button>`
+        }
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+//  RSVP — REAL SUPABASE TOGGLE
+// ═══════════════════════════════════════════════
+async function toggleRsvp(eventId) {
+  // Require login
+  if (!currentUser) {
+    DPI.toast('Please log in to RSVP for events');
+    setTimeout(() => window.location.href = `login.html?redirect=events.html`, 1500);
+    return false;
+  }
+
+  const ev = allEvents.find(e => e.id === eventId);
+  if (!ev || ev.status === 'past') return false;
+
+  const alreadyRsvped = userRsvpSet.has(eventId);
+
+  try {
+    if (alreadyRsvped) {
+      // ── Cancel RSVP ─────────────────────────────────────
+      const { error } = await window.sb
+        .from('rsvps')
+        .delete()
+        .eq('event_id', eventId)
+        .eq('user_id', currentUser.id);
+
+      if (error) throw error;
+
+      userRsvpSet.delete(eventId);
+      ev.rsvp_count = Math.max(0, ev.rsvp_count - 1);
+      DPI.toast('RSVP cancelled');
+    } else {
+      // ── Capacity check ───────────────────────────────────
+      if (ev.rsvp_count >= ev.capacity) {
+        DPI.toast('Sorry, this event is full');
+        return false;
+      }
+
+      // ── Add RSVP ─────────────────────────────────────────
+      const { error } = await window.sb
+        .from('rsvps')
+        .insert({ event_id: eventId, user_id: currentUser.id });
+
+      if (error) {
+        if (error.code === '23505') { // unique violation — already exists
+          DPI.toast('You\'re already registered!');
+          userRsvpSet.add(eventId);
+          return true;
+        }
+        throw error;
+      }
+
+      userRsvpSet.add(eventId);
+      ev.rsvp_count++;
+      DPI.toast(`🎉 RSVP confirmed for ${ev.title}!`);
+    }
+    return true;
+  } catch (err) {
+    console.error('RSVP error:', err);
+    DPI.toast('Something went wrong. Please try again.');
+    return false;
+  }
+}
+
+async function quickRsvp(id, btn) {
+  btn.disabled = true;
+  btn.innerHTML = '<span class="mini-spinner"></span>';
+  const success = await toggleRsvp(id);
+  if (success !== false) {
+    btn.disabled = false;
+    btn.textContent = userRsvpSet.has(id) ? '✓ Going' : 'RSVP';
+    btn.classList.toggle('rsvped', userRsvpSet.has(id));
+  } else {
+    btn.disabled = false;
+    btn.textContent = userRsvpSet.has(id) ? '✓ Going' : 'RSVP';
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  EVENT DETAIL MODAL
+// ═══════════════════════════════════════════════
+function openModalEv(id) {
+  openEventId = id;
+  refreshModal(id);
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function refreshModal(id) {
+  const ev = allEvents.find(e => e.id === id);
+  if (!ev) return;
+
+  const d      = new Date(ev.event_date);
+  const day    = d.getDate();
+  const month  = d.toLocaleDateString('en-GB', { month: 'long' });
+  const year   = d.getFullYear();
+  const tc     = TYPE_COLORS[ev.event_type] || TYPE_COLORS.general;
+  const isPast = ev.status === 'past';
+  const isRsvped = userRsvpSet.has(id);
+  const isFull   = ev.rsvp_count >= ev.capacity && !isRsvped;
+  const pct      = Math.min(100, Math.round((ev.rsvp_count / ev.capacity) * 100));
+
+  document.getElementById('emHeaderBg').style.background = tc.grad;
+  document.getElementById('emDay').textContent       = day;
+  document.getElementById('emMonthYear').textContent = `${month} ${year}${ev.event_time ? ' · ' + ev.event_time : ''}`;
+  document.getElementById('emType').textContent      = cap(ev.event_type || 'Event');
+  document.getElementById('emTitle').textContent     = ev.title;
+  document.getElementById('emDesc').textContent      = ev.description || '';
+
+  document.getElementById('emDetails').innerHTML = `
+    <div class="em-detail-row"><div class="em-detail-icon">📅</div><div class="em-detail-info"><div class="em-detail-label">Date & Time</div><div class="em-detail-value">${day} ${month} ${year}${ev.event_time ? ' · ' + ev.event_time : ''}</div></div></div>
+    ${ev.venue ? `<div class="em-detail-row"><div class="em-detail-icon">📍</div><div class="em-detail-info"><div class="em-detail-label">Venue</div><div class="em-detail-value">${escHtml(ev.venue)}</div></div></div>` : ''}
+    <div class="em-detail-row"><div class="em-detail-icon">🎟</div><div class="em-detail-info"><div class="em-detail-label">Capacity</div><div class="em-detail-value">${ev.rsvp_count} registered of ${ev.capacity} seats</div></div></div>
+  `;
+
+  document.getElementById('emRsvpCount').textContent    = `${pct}% full`;
+  document.getElementById('emRsvpFill').style.width     = pct + '%';
+  document.getElementById('emRsvpLeft').textContent     = `${ev.rsvp_count} attending`;
+  document.getElementById('emRsvpRight').textContent    = `${ev.capacity - ev.rsvp_count} spots left`;
+
+  // RSVP button state
+  const btn = document.getElementById('emRsvpBtn');
+  if (!currentUser) {
+    btn.className    = 'btn-login-prompt';
+    btn.textContent  = '🔑 Log In to RSVP';
+    btn.disabled     = false;
+    btn.onclick      = () => { window.location.href = `login.html?redirect=events.html`; };
+  } else if (isPast) {
+    btn.className    = 'btn-rsvp-modal';
+    btn.textContent  = 'This event has ended';
+    btn.disabled     = true;
+    btn.style.opacity= '0.5';
+    btn.onclick      = null;
+  } else if (isFull) {
+    btn.className    = 'btn-rsvp-modal';
+    btn.textContent  = '⚠ Event is Full';
+    btn.disabled     = true;
+    btn.style.opacity= '0.6';
+    btn.onclick      = null;
+  } else {
+    btn.className    = `btn-rsvp-modal ${isRsvped ? 'rsvped' : ''}`;
+    btn.textContent  = isRsvped ? "✓ You're Going — Cancel RSVP" : '🎟 RSVP — Reserve My Spot';
+    btn.disabled     = false;
+    btn.style.opacity= '1';
+    btn.onclick      = () => rsvpFromModal(id);
+  }
+}
+
+async function rsvpFromModal(id) {
+  const btn = document.getElementById('emRsvpBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="mini-spinner"></span> Processing…';
+
+  const success = await toggleRsvp(id);
+  if (success !== false) {
+    refreshModal(id);
+    renderGrid();
+    renderFeatured();
+  } else {
+    btn.disabled = false;
+    refreshModal(id);
+  }
+}
+
+function buildRsvpBtn(ev, isRsvped, isFull, isPast, handler) {
+  if (!currentUser) {
+    return `<button class="btn-rsvp" onclick="window.location.href='login.html?redirect=events.html'">🔑 Log In to RSVP</button>`;
+  }
+  if (isPast)    return `<button class="btn-rsvp" disabled style="opacity:0.5;">Event Ended</button>`;
+  if (isFull)    return `<button class="btn-rsvp" disabled style="opacity:0.6;">⚠ Event is Full</button>`;
+  if (isRsvped)  return `<button class="btn-rsvp rsvped" onclick="${handler}(${ev.id})">✓ You're Going!</button>`;
+  return `<button class="btn-rsvp" onclick="${handler}(${ev.id})">🎟 RSVP Now — Free</button>`;
+}
+
+function closeModal(e) { if (e.target === document.getElementById('modalOverlay')) closeModalDirect(); }
+function closeModalDirect() { document.getElementById('modalOverlay').classList.remove('open'); document.body.style.overflow = ''; }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalDirect(); });
+
+// ═══════════════════════════════════════════════
+//  FILTER & SEARCH
+// ═══════════════════════════════════════════════
+function filterCat(cat, el) {
+  activeCategory = cat;
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderGrid();
+}
+
+function onEvSearch() {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(renderGrid, 300);
+}
+
+// ═══════════════════════════════════════════════
+//  SKELETONS & ERROR
+// ═══════════════════════════════════════════════
+function showSkeletons() {
+  document.getElementById('eventsGrid').innerHTML = Array(6).fill(0).map(() => `
+    <div class="skel-card">
+      <div class="skeleton skel-banner"></div>
+      <div class="skel-body">
+        <div class="skeleton skel-line w80"></div>
+        <div class="skeleton skel-line w60"></div>
+        <div class="skeleton skel-line w40"></div>
+      </div>
+    </div>`).join('');
+  document.getElementById('featuredCard').innerHTML = '';
+}
+
+function showEventsError() {
+  document.getElementById('eventsGrid').innerHTML = `
+    <div class="no-events">
+      <div class="ne-icon">⚠️</div>
+      <h3>Could not load events</h3>
+      <p>Check your internet connection or Supabase credentials.</p>
+      <button class="btn-retry" onclick="loadEvents()">Try Again</button>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════
+//  UTILITIES
+// ═══════════════════════════════════════════════
+function getCountdown(dateObj) {
+  const diff = dateObj - new Date();
+  if (diff <= 0) return null;
+  return {
+    days:  Math.floor(diff / 86400000),
+    hours: Math.floor((diff % 86400000) / 3600000),
+    mins:  Math.floor((diff % 3600000) / 60000),
+  };
+}
+
+function cap(str) {
+  if (!str) return '';
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function escHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+
+function DPI.toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+</script>
+<div id="dpiToast"></div>
+</body>
+</html>

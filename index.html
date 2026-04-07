@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DPI Society — Connect, Share, Contribute</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #006A4E;
+    --green-light: #00875F;
+    --green-pale: #E8F5F0;
+    --red: #C8102E;
+    --red-light: #E8102E;
+    --gold: #F4A600;
+    --dark: #0D1A13;
+    --dark2: #1A2E22;
+    --text: #1A2E22;
+    --text-muted: #5A7A68;
+    --border: rgba(0,106,78,0.12);
+    --white: #FFFFFF;
+    --off-white: #F7FAF8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--white);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* ── NAVBAR ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(255,255,255,0.96);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    height: 68px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .nav-brand {
+    display: flex; align-items: center; gap: 12px; text-decoration: none;
+  }
+  .nav-logo {
+    width: 42px; height: 42px; border-radius: 10px;
+    background: var(--green);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 18px; font-weight: 900; color: white;
+    letter-spacing: -1px;
+  }
+  .nav-brand-text { line-height: 1.2; }
+  .nav-brand-text strong {
+    display: block; font-size: 15px; font-weight: 600; color: var(--green);
+  }
+  .nav-brand-text span {
+    font-size: 11px; color: var(--text-muted); letter-spacing: 0.03em;
+  }
+
+  .nav-links {
+    display: flex; align-items: center; gap: 6px; list-style: none;
+  }
+  .nav-links a {
+    font-size: 13.5px; font-weight: 500; color: var(--text-muted);
+    text-decoration: none; padding: 6px 12px; border-radius: 6px;
+    transition: all 0.2s;
+  }
+  .nav-links a:hover { color: var(--green); background: var(--green-pale); }
+
+  .nav-actions { display: flex; gap: 8px; align-items: center; }
+
+  .btn-outline {
+    font-size: 13px; font-weight: 500;
+    padding: 8px 18px; border-radius: 8px;
+    border: 1.5px solid var(--green); color: var(--green);
+    background: transparent; cursor: pointer; text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-outline:hover { background: var(--green-pale); }
+
+  .btn-primary {
+    font-size: 13px; font-weight: 500;
+    padding: 8px 18px; border-radius: 8px;
+    border: none; background: var(--green); color: white;
+    cursor: pointer; text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-primary:hover { background: var(--green-light); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    background: var(--dark);
+    position: relative; overflow: hidden;
+    display: flex; align-items: center;
+    padding: 100px 2rem 60px;
+  }
+
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 70% at 80% 50%, rgba(0,106,78,0.35) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 20% 80%, rgba(200,16,46,0.15) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 50% 0%, rgba(0,106,78,0.2) 0%, transparent 60%);
+  }
+
+  .hero-pattern {
+    position: absolute; inset: 0; opacity: 0.04;
+    background-image: repeating-linear-gradient(
+      0deg, transparent, transparent 40px, rgba(255,255,255,0.5) 40px, rgba(255,255,255,0.5) 41px
+    ), repeating-linear-gradient(
+      90deg, transparent, transparent 40px, rgba(255,255,255,0.5) 40px, rgba(255,255,255,0.5) 41px
+    );
+  }
+
+  .hero-content {
+    position: relative; z-index: 2;
+    max-width: 1100px; margin: 0 auto; width: 100%;
+    display: grid; grid-template-columns: 1fr 420px; gap: 60px; align-items: center;
+  }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(0,106,78,0.3); border: 1px solid rgba(0,106,78,0.5);
+    border-radius: 100px; padding: 6px 14px 6px 8px;
+    margin-bottom: 24px;
+  }
+  .hero-badge-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--gold);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(0.8); }
+  }
+  .hero-badge span { font-size: 12px; color: #A0C4B4; font-weight: 500; letter-spacing: 0.04em; }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(38px, 5vw, 64px);
+    font-weight: 900;
+    color: white;
+    line-height: 1.1;
+    margin-bottom: 20px;
+  }
+  .hero-title .accent { color: var(--gold); }
+  .hero-title .line2 { color: rgba(255,255,255,0.7); }
+
+  .hero-sub {
+    font-size: 17px; line-height: 1.7;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 36px; max-width: 500px;
+  }
+
+  .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  .btn-hero-primary {
+    font-size: 14px; font-weight: 600;
+    padding: 14px 28px; border-radius: 10px;
+    background: var(--green); color: white;
+    border: none; cursor: pointer; text-decoration: none;
+    transition: all 0.2s;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-hero-primary:hover { background: var(--green-light); transform: translateY(-1px); }
+
+  .btn-hero-outline {
+    font-size: 14px; font-weight: 500;
+    padding: 14px 28px; border-radius: 10px;
+    background: transparent; color: rgba(255,255,255,0.8);
+    border: 1.5px solid rgba(255,255,255,0.2); cursor: pointer; text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-hero-outline:hover { border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.06); }
+
+  /* Hero card */
+  .hero-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px; padding: 28px;
+    backdrop-filter: blur(10px);
+  }
+  .hero-card-title {
+    font-size: 13px; font-weight: 600; color: var(--gold);
+    letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 20px;
+  }
+  .member-preview {
+    display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;
+  }
+  .member-item {
+    display: flex; align-items: center; gap: 12px;
+    background: rgba(255,255,255,0.04); border-radius: 10px; padding: 10px 12px;
+    border: 1px solid rgba(255,255,255,0.07);
+  }
+  .member-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600; flex-shrink: 0;
+  }
+  .av1 { background: rgba(0,106,78,0.5); color: #7DDFB8; }
+  .av2 { background: rgba(200,16,46,0.4); color: #FFB3C1; }
+  .av3 { background: rgba(244,166,0,0.4); color: #FFE099; }
+  .member-info { flex: 1; }
+  .member-name { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.9); }
+  .member-meta { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+  .member-batch {
+    font-size: 11px; font-weight: 600; color: var(--gold);
+    background: rgba(244,166,0,0.15); border-radius: 4px; padding: 2px 7px;
+  }
+
+  .hero-card-divider {
+    border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 16px 0;
+  }
+  .hero-card-stats {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  }
+  .hcs-item { text-align: center; }
+  .hcs-num { font-size: 22px; font-weight: 700; color: white; }
+  .hcs-label { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    background: var(--green);
+    padding: 28px 2rem;
+  }
+  .stats-inner {
+    max-width: 1100px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+  }
+  .stat-item {
+    text-align: center; padding: 0 20px;
+    border-right: 1px solid rgba(255,255,255,0.2);
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px; font-weight: 900; color: white;
+  }
+  .stat-label { font-size: 13px; color: rgba(255,255,255,0.75); margin-top: 4px; }
+
+  /* ── SECTION COMMON ── */
+  section { padding: 80px 2rem; }
+  .section-inner { max-width: 1100px; margin: 0 auto; }
+
+  .section-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--green);
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 3vw, 40px);
+    font-weight: 900; color: var(--dark); line-height: 1.2;
+    margin-bottom: 16px;
+  }
+  .section-sub {
+    font-size: 16px; color: var(--text-muted); line-height: 1.7;
+    max-width: 540px;
+  }
+
+  /* ── FEATURES ── */
+  .features { background: var(--off-white); }
+  .features-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 24px; margin-top: 48px;
+  }
+  .feature-card {
+    background: white; border-radius: 16px;
+    padding: 28px; border: 1px solid var(--border);
+    transition: all 0.25s;
+  }
+  .feature-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,106,78,0.1); }
+  .feature-icon {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: var(--green-pale); display: flex; align-items: center;
+    justify-content: center; margin-bottom: 18px; font-size: 22px;
+  }
+  .feature-card h3 { font-size: 17px; font-weight: 600; margin-bottom: 10px; color: var(--dark); }
+  .feature-card p { font-size: 14px; line-height: 1.65; color: var(--text-muted); }
+  .feature-tag {
+    display: inline-block; margin-top: 16px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+    color: var(--green); background: var(--green-pale);
+    padding: 4px 10px; border-radius: 5px;
+  }
+
+  /* ── EVENTS ── */
+  .events-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 24px; margin-top: 48px;
+  }
+  .event-card {
+    border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
+    transition: all 0.25s;
+  }
+  .event-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+  .event-banner {
+    height: 100px; display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .eb-green { background: linear-gradient(135deg, #006A4E 0%, #00A36C 100%); }
+  .eb-red { background: linear-gradient(135deg, #8B0000 0%, #C8102E 100%); }
+  .eb-gold { background: linear-gradient(135deg, #8B6000 0%, #F4A600 100%); }
+  .event-date-badge {
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 10px; padding: 8px 16px; text-align: center;
+  }
+  .event-date-badge .day { font-size: 28px; font-weight: 700; color: white; line-height: 1; }
+  .event-date-badge .month { font-size: 11px; color: rgba(255,255,255,0.8); text-transform: uppercase; letter-spacing: 0.08em; }
+  .event-body { padding: 20px; }
+  .event-type {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--green); margin-bottom: 8px;
+  }
+  .event-body h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; color: var(--dark); }
+  .event-body p { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+  .event-footer {
+    padding: 12px 20px; border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .event-attendees { font-size: 12px; color: var(--text-muted); }
+  .btn-sm {
+    font-size: 12px; font-weight: 600; padding: 6px 14px;
+    border-radius: 6px; background: var(--green); color: white;
+    border: none; cursor: pointer; text-decoration: none;
+    transition: background 0.2s;
+  }
+  .btn-sm:hover { background: var(--green-light); }
+
+  /* ── MEMBERS ── */
+  .members { background: var(--off-white); }
+  .members-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 20px; margin-top: 48px;
+  }
+  .member-card {
+    background: white; border-radius: 16px; padding: 24px 20px;
+    border: 1px solid var(--border); text-align: center;
+    transition: all 0.25s;
+  }
+  .member-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(0,106,78,0.1); }
+  .mc-avatar {
+    width: 64px; height: 64px; border-radius: 50%;
+    margin: 0 auto 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 700; font-family: 'Playfair Display', serif;
+  }
+  .mc-av1 { background: #E8F5F0; color: var(--green); }
+  .mc-av2 { background: #FDEEF0; color: var(--red); }
+  .mc-av3 { background: #FFF8E6; color: #B87800; }
+  .mc-av4 { background: #EEF4FF; color: #2B5DB8; }
+  .member-card h4 { font-size: 14px; font-weight: 600; color: var(--dark); margin-bottom: 4px; }
+  .member-card .dept { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+  .member-card .batch {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.05em;
+    color: var(--green); background: var(--green-pale);
+    display: inline-block; padding: 3px 10px; border-radius: 5px;
+  }
+
+  /* ── RESOURCES PREVIEW ── */
+  .resources-list { margin-top: 40px; display: flex; flex-direction: column; gap: 12px; }
+  .resource-item {
+    display: flex; align-items: center; gap: 16px;
+    background: white; border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px 20px;
+    transition: all 0.2s;
+  }
+  .resource-item:hover { border-color: var(--green); background: var(--green-pale); }
+  .resource-icon {
+    width: 42px; height: 42px; border-radius: 10px;
+    background: var(--green-pale); display: flex; align-items: center;
+    justify-content: center; font-size: 18px; flex-shrink: 0;
+  }
+  .resource-info { flex: 1; }
+  .resource-info h4 { font-size: 14px; font-weight: 600; color: var(--dark); margin-bottom: 3px; }
+  .resource-info p { font-size: 12px; color: var(--text-muted); }
+  .resource-meta { display: flex; gap: 8px; align-items: center; }
+  .resource-tag {
+    font-size: 11px; font-weight: 600; color: var(--green);
+    background: var(--green-pale); padding: 3px 9px; border-radius: 5px;
+  }
+  .resource-size { font-size: 12px; color: var(--text-muted); }
+
+  /* ── JOIN CTA ── */
+  .join-cta {
+    background: var(--dark); padding: 80px 2rem; text-align: center; position: relative; overflow: hidden;
+  }
+  .join-cta-bg {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(0,106,78,0.3) 0%, transparent 70%);
+  }
+  .join-cta-inner { position: relative; z-index: 2; max-width: 600px; margin: 0 auto; }
+  .join-cta h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(30px, 4vw, 48px); font-weight: 900;
+    color: white; margin-bottom: 16px;
+  }
+  .join-cta p { font-size: 17px; color: rgba(255,255,255,0.6); line-height: 1.7; margin-bottom: 36px; }
+  .join-cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--dark2); padding: 48px 2rem 28px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .footer-inner {
+    max-width: 1100px; margin: 0 auto;
+  }
+  .footer-top {
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px; padding-bottom: 40px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .footer-brand { }
+  .footer-logo {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+  }
+  .footer-logo-box {
+    width: 38px; height: 38px; border-radius: 9px;
+    background: var(--green); display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 900; color: white;
+  }
+  .footer-logo-text { font-size: 15px; font-weight: 600; color: white; }
+  .footer-brand p { font-size: 13px; color: rgba(255,255,255,0.45); line-height: 1.7; max-width: 240px; }
+  .footer-col h5 { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); margin-bottom: 16px; }
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+  .footer-col ul a { font-size: 13px; color: rgba(255,255,255,0.45); text-decoration: none; transition: color 0.2s; }
+  .footer-col ul a:hover { color: rgba(255,255,255,0.8); }
+  .footer-bottom {
+    padding-top: 24px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px; color: rgba(255,255,255,0.3);
+    flex-wrap: wrap; gap: 12px;
+  }
+  .footer-bottom a { color: var(--gold); text-decoration: none; }
+
+  /* ── MOBILE ── */
+  @media (max-width: 768px) {
+    .hero-content { grid-template-columns: 1fr; }
+    .hero-card { display: none; }
+    .nav-links { display: none; }
+    .stats-inner { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .stat-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 20px; }
+    .features-grid { grid-template-columns: 1fr; }
+    .events-grid { grid-template-columns: 1fr; }
+    .members-grid { grid-template-columns: repeat(2, 1fr); }
+    .footer-top { grid-template-columns: 1fr 1fr; }
+    nav { padding: 0 1rem; }
+    .nav-actions .btn-outline { display: none; }
+  }
+
+  /* ── ANIMATIONS ── */
+  .fade-in { opacity: 0; transform: translateY(20px); transition: all 0.6s ease; }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+</style>
+<script src="config.js"></script>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <a href="#" class="nav-brand">
+    <div class="nav-logo">DPI</div>
+    <div class="nav-brand-text">
+      <strong>DPI Society</strong>
+      <span>Dhaka Polytechnic Institute</span>
+    </div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#members">Members</a></li>
+    <li><a href="#events">Events</a></li>
+    <li><a href="#resources">Resources</a></li>
+    <li><a href="#forum">Forum</a></li>
+  </ul>
+  <div class="nav-actions">
+    <a href="#" class="btn-outline">Log In</a>
+    <a href="#" class="btn-primary">Join Now</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-pattern"></div>
+  <div class="hero-content">
+    <div>
+      <div class="hero-badge">
+        <div class="hero-badge-dot"></div>
+        <span>Official Alumni Network · Est. 2024</span>
+      </div>
+      <h1 class="hero-title">
+        Connect with<br>
+        <span class="accent">DPI Alumni</span><br>
+        <span class="line2">Worldwide</span>
+      </h1>
+      <p class="hero-sub">
+        The official community for ex-students of Dhaka Polytechnic Institute. Share knowledge, find opportunities, and stay connected with your batchmates.
+      </p>
+      <div class="hero-ctas">
+        <a href="#" class="btn-hero-primary">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zM6 5.5a2 2 0 114 0 2 2 0 01-4 0zm2 4.5c1.8 0 3.3.9 4.1 2.2a5.98 5.98 0 01-8.2 0C4.7 10.9 6.2 10 8 10z" fill="white"/></svg>
+          Join the Community
+        </a>
+        <a href="#" class="btn-hero-outline">Explore Members</a>
+      </div>
+    </div>
+    <div class="hero-card">
+      <div class="hero-card-title">🎓 Recent Members</div>
+      <div class="member-preview">
+        <div class="member-item">
+          <div class="member-avatar av1">RA</div>
+          <div class="member-info">
+            <div class="member-name">Rafiqul Alam</div>
+            <div class="member-meta">Civil Technology · Dhaka</div>
+          </div>
+          <span class="member-batch">B-67</span>
+        </div>
+        <div class="member-item">
+          <div class="member-avatar av2">SH</div>
+          <div class="member-info">
+            <div class="member-name">Sumaiya Hossain</div>
+            <div class="member-meta">Computer Technology · Chittagong</div>
+          </div>
+          <span class="member-batch">B-71</span>
+        </div>
+        <div class="member-item">
+          <div class="member-avatar av3">MK</div>
+          <div class="member-info">
+            <div class="member-name">Mehedi Khan</div>
+            <div class="member-meta">Electronics · Sylhet</div>
+          </div>
+          <span class="member-batch">B-69</span>
+        </div>
+      </div>
+      <hr class="hero-card-divider">
+      <div class="hero-card-stats">
+        <div class="hcs-item">
+          <div class="hcs-num">1,240+</div>
+          <div class="hcs-label">Alumni</div>
+        </div>
+        <div class="hcs-item">
+          <div class="hcs-num">18</div>
+          <div class="hcs-label">Departments</div>
+        </div>
+        <div class="hcs-item">
+          <div class="hcs-num">340+</div>
+          <div class="hcs-label">Resources</div>
+        </div>
+        <div class="hcs-item">
+          <div class="hcs-num">24</div>
+          <div class="hcs-label">Events</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-item">
+      <div class="stat-num">1,240+</div>
+      <div class="stat-label">Registered Alumni</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">18</div>
+      <div class="stat-label">Departments</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">340+</div>
+      <div class="stat-label">Shared Resources</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">24</div>
+      <div class="stat-label">Events Hosted</div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="features" id="about">
+  <div class="section-inner">
+    <div class="fade-in">
+      <div class="section-label">What We Offer</div>
+      <h2 class="section-title">Everything for DPI Alumni</h2>
+      <p class="section-sub">From reconnecting with old classmates to finding career opportunities — DPI Society is your lifelong community.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card fade-in">
+        <div class="feature-icon">👥</div>
+        <h3>Member Directory</h3>
+        <p>Search and connect with fellow alumni by batch, department, location, or profession. Reconnect with your classmates wherever they are.</p>
+        <span class="feature-tag">Browse Members →</span>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon">📅</div>
+        <h3>Events & Reunions</h3>
+        <p>Stay updated on alumni meetups, reunions, seminars, and career fairs. RSVP and manage your attendance all in one place.</p>
+        <span class="feature-tag">View Events →</span>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon">📚</div>
+        <h3>Resource Library</h3>
+        <p>Access and share study materials, notes, project reports, and career resources uploaded by alumni across all departments.</p>
+        <span class="feature-tag">Browse Resources →</span>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon">💬</div>
+        <h3>Community Forum</h3>
+        <p>Discuss topics, ask questions, share experiences and advice. A dedicated space for DPI alumni conversations and networking.</p>
+        <span class="feature-tag">Join Forum →</span>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon">🏅</div>
+        <h3>Batch Groups</h3>
+        <p>Connect specifically with your batch. Dedicated spaces for each graduating batch to share memories and stay in touch.</p>
+        <span class="feature-tag">Find Your Batch →</span>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon">💼</div>
+        <h3>Career Board</h3>
+        <p>Post and find job opportunities shared by alumni. Build your professional network within the DPI community.</p>
+        <span class="feature-tag">Coming Soon</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EVENTS -->
+<section id="events">
+  <div class="section-inner">
+    <div class="fade-in" style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:16px;">
+      <div>
+        <div class="section-label">Upcoming & Recent</div>
+        <h2 class="section-title">Events</h2>
+      </div>
+      <a href="#" class="btn-outline" style="margin-bottom: 8px;">View All Events</a>
+    </div>
+    <div class="events-grid">
+      <div class="event-card fade-in">
+        <div class="event-banner eb-green">
+          <div class="event-date-badge">
+            <div class="day">15</div>
+            <div class="month">May 2025</div>
+          </div>
+        </div>
+        <div class="event-body">
+          <div class="event-type">Reunion</div>
+          <h3>Annual Alumni Reunion 2025</h3>
+          <p>A grand gathering of DPI alumni from all batches. Food, memories, and reconnections.</p>
+        </div>
+        <div class="event-footer">
+          <span class="event-attendees">🎟 142 attending</span>
+          <a href="#" class="btn-sm">RSVP</a>
+        </div>
+      </div>
+      <div class="event-card fade-in">
+        <div class="event-banner eb-red">
+          <div class="event-date-badge">
+            <div class="day">22</div>
+            <div class="month">Apr 2025</div>
+          </div>
+        </div>
+        <div class="event-body">
+          <div class="event-type">Seminar</div>
+          <h3>Career in Technology: Alumni Panel</h3>
+          <p>Senior alumni share career journeys in engineering and technology fields.</p>
+        </div>
+        <div class="event-footer">
+          <span class="event-attendees">🎟 87 attending</span>
+          <a href="#" class="btn-sm">RSVP</a>
+        </div>
+      </div>
+      <div class="event-card fade-in">
+        <div class="event-banner eb-gold">
+          <div class="event-date-badge">
+            <div class="day">10</div>
+            <div class="month">Jun 2025</div>
+          </div>
+        </div>
+        <div class="event-body">
+          <div class="event-type">Workshop</div>
+          <h3>Free Skill Development Workshop</h3>
+          <p>Hands-on workshop on AutoCAD and PLC programming for recent graduates.</p>
+        </div>
+        <div class="event-footer">
+          <span class="event-attendees">🎟 55 attending</span>
+          <a href="#" class="btn-sm">RSVP</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MEMBERS -->
+<section class="members" id="members">
+  <div class="section-inner">
+    <div class="fade-in" style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:16px;">
+      <div>
+        <div class="section-label">Our Community</div>
+        <h2 class="section-title">Featured Members</h2>
+      </div>
+      <a href="#" class="btn-outline" style="margin-bottom:8px;">View All Members</a>
+    </div>
+    <div class="members-grid">
+      <div class="member-card fade-in">
+        <div class="mc-avatar mc-av1">RA</div>
+        <h4>Rafiqul Alam</h4>
+        <p class="dept">Civil Technology</p>
+        <span class="batch">Batch 67</span>
+      </div>
+      <div class="member-card fade-in">
+        <div class="mc-avatar mc-av2">SH</div>
+        <h4>Sumaiya Hossain</h4>
+        <p class="dept">Computer Technology</p>
+        <span class="batch">Batch 71</span>
+      </div>
+      <div class="member-card fade-in">
+        <div class="mc-avatar mc-av3">MK</div>
+        <h4>Mehedi Khan</h4>
+        <p class="dept">Electronics Technology</p>
+        <span class="batch">Batch 69</span>
+      </div>
+      <div class="member-card fade-in">
+        <div class="mc-avatar mc-av4">NI</div>
+        <h4>Nazmul Islam</h4>
+        <p class="dept">Electrical Technology</p>
+        <span class="batch">Batch 70</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESOURCES -->
+<section id="resources">
+  <div class="section-inner">
+    <div class="fade-in" style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:16px;">
+      <div>
+        <div class="section-label">Knowledge Base</div>
+        <h2 class="section-title">Recent Resources</h2>
+      </div>
+      <a href="#" class="btn-outline" style="margin-bottom:8px;">View All Resources</a>
+    </div>
+    <div class="resources-list">
+      <div class="resource-item fade-in">
+        <div class="resource-icon">📄</div>
+        <div class="resource-info">
+          <h4>Civil Technology Final Year Project Guidelines</h4>
+          <p>Uploaded by Rafiqul Alam · Batch 67 · 3 days ago</p>
+        </div>
+        <div class="resource-meta">
+          <span class="resource-tag">Civil</span>
+          <span class="resource-size">2.4 MB</span>
+        </div>
+      </div>
+      <div class="resource-item fade-in">
+        <div class="resource-icon">📊</div>
+        <div class="resource-info">
+          <h4>PLC Programming Complete Notes (Bangla)</h4>
+          <p>Uploaded by Nazmul Islam · Batch 70 · 1 week ago</p>
+        </div>
+        <div class="resource-meta">
+          <span class="resource-tag">Electrical</span>
+          <span class="resource-size">5.1 MB</span>
+        </div>
+      </div>
+      <div class="resource-item fade-in">
+        <div class="resource-icon">💻</div>
+        <div class="resource-info">
+          <h4>Web Development Roadmap for Diploma Students</h4>
+          <p>Uploaded by Sumaiya Hossain · Batch 71 · 2 weeks ago</p>
+        </div>
+        <div class="resource-meta">
+          <span class="resource-tag">Computer</span>
+          <span class="resource-size">1.2 MB</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- JOIN CTA -->
+<section class="join-cta">
+  <div class="join-cta-bg"></div>
+  <div class="join-cta-inner fade-in">
+    <h2>Ready to Join the DPI Family?</h2>
+    <p>Thousands of DPI alumni are already connected. Share your journey, find opportunities, and help the next generation of polytechnic graduates.</p>
+    <div class="join-cta-btns">
+      <a href="#" class="btn-hero-primary">Create Free Account</a>
+      <a href="#" class="btn-hero-outline">Learn More</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <div class="footer-logo-box">DPI</div>
+          <span class="footer-logo-text">DPI Society</span>
+        </div>
+        <p>The official alumni community of Dhaka Polytechnic Institute. Connect, Share, Contribute.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Community</h5>
+        <ul>
+          <li><a href="#">Member Directory</a></li>
+          <li><a href="#">Events</a></li>
+          <li><a href="#">Forum</a></li>
+          <li><a href="#">Resources</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Account</h5>
+        <ul>
+          <li><a href="#">Register</a></li>
+          <li><a href="#">Log In</a></li>
+          <li><a href="#">My Profile</a></li>
+          <li><a href="#">Settings</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>About</h5>
+        <ul>
+          <li><a href="#">About DPI</a></li>
+          <li><a href="#">About Society</a></li>
+          <li><a href="#">Contact Us</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 DPI Society. Built for <a href="#">Dhaka Polytechnic Institute</a> Alumni.</span>
+      <span>Made with ❤️ by the DPI Community</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+<div id="dpiToast"></div>
+</body>
+</html>

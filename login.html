@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log In — DPI Society</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<!-- ✅ SUPABASE SDK -->
+<script src="config.js"></script>
+<style>
+  :root {
+    --green:#006A4E; --green-light:#00875F; --green-pale:#E8F5F0;
+    --red:#C8102E; --gold:#F4A600;
+    --dark:#0D1A13; --dark2:#1A2E22;
+    --text:#1A2E22; --text-muted:#5A7A68;
+    --border:rgba(0,106,78,0.15);
+    --white:#FFFFFF; --off-white:#F7FAF8;
+    --error:#D93025; --success:#1E8C5A;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--off-white);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;}
+
+  .login-wrap{display:grid;grid-template-columns:1fr 460px;min-height:100vh;width:100%;}
+
+  /* ── LEFT ── */
+  .login-left{background:var(--dark);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:60px 48px;}
+  .ll-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 30% 40%,rgba(0,106,78,0.4) 0%,transparent 65%),radial-gradient(ellipse 50% 40% at 80% 80%,rgba(200,16,46,0.15) 0%,transparent 60%),radial-gradient(ellipse 40% 50% at 80% 10%,rgba(244,166,0,0.1) 0%,transparent 60%);}
+  .ll-pattern{position:absolute;inset:0;opacity:0.025;background-image:radial-gradient(circle,rgba(255,255,255,0.8) 1px,transparent 1px);background-size:28px 28px;}
+  .ll-content{position:relative;z-index:2;max-width:440px;}
+  .ll-logo{display:flex;align-items:center;gap:12px;margin-bottom:48px;text-decoration:none;}
+  .ll-logo-box{width:44px;height:44px;border-radius:11px;background:var(--green);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:18px;font-weight:900;color:white;}
+  .ll-logo-text{font-size:16px;font-weight:600;color:white;}
+  .ll-title{font-family:'Playfair Display',serif;font-size:44px;font-weight:900;color:white;line-height:1.1;margin-bottom:20px;}
+  .ll-title em{color:var(--gold);font-style:normal;}
+  .ll-sub{font-size:15px;color:rgba(255,255,255,0.5);line-height:1.7;margin-bottom:48px;}
+  .testimonial{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:20px 22px;margin-bottom:32px;}
+  .testimonial-text{font-size:14px;color:rgba(255,255,255,0.7);line-height:1.6;font-style:italic;margin-bottom:14px;}
+  .testimonial-author{display:flex;align-items:center;gap:10px;}
+  .t-avatar{width:32px;height:32px;border-radius:50%;background:rgba(0,106,78,0.5);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#7DDFB8;}
+  .t-name{font-size:13px;font-weight:500;color:rgba(255,255,255,0.8);}
+  .t-batch{font-size:11px;color:rgba(255,255,255,0.4);}
+  .ll-dpi-tag{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 14px;}
+  .ll-dpi-tag span{font-size:12px;color:rgba(255,255,255,0.4);}
+  .ll-dpi-badge{background:var(--red);color:white;font-size:10px;font-weight:700;letter-spacing:0.08em;padding:2px 8px;border-radius:4px;}
+
+  /* ── RIGHT ── */
+  .login-right{background:white;display:flex;flex-direction:column;justify-content:center;padding:48px 44px;border-left:1px solid var(--border);}
+  .lr-header{margin-bottom:28px;}
+  .lr-header h1{font-family:'Playfair Display',serif;font-size:30px;font-weight:900;color:var(--dark);margin-bottom:6px;}
+  .lr-header p{font-size:14px;color:var(--text-muted);}
+  .lr-header p a{color:var(--green);text-decoration:none;font-weight:500;}
+
+  /* Role chips */
+  .role-label{font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;}
+  .role-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px;}
+  .role-chip{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:100px;font-size:13px;font-weight:500;cursor:pointer;border:1.5px solid var(--border);background:white;transition:all 0.2s;color:var(--text-muted);}
+  .role-chip:hover{border-color:rgba(0,106,78,0.4);}
+  .role-chip.active{background:var(--green-pale);border-color:var(--green);color:var(--green);}
+
+  /* Error / info banners */
+  .banner{display:none;align-items:flex-start;gap:10px;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;line-height:1.5;}
+  .banner.show{display:flex;}
+  .banner-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+  .banner-error{background:#FFF0F0;border:1px solid rgba(217,48,37,0.25);color:var(--error);}
+  .banner-warning{background:#FFF8E6;border:1px solid rgba(244,166,0,0.35);color:#8B6000;}
+  .banner-success{background:#E8FFF4;border:1px solid rgba(13,122,78,0.25);color:var(--success);}
+  .banner-info{background:var(--green-pale);border:1px solid rgba(0,106,78,0.2);color:var(--green);}
+
+  /* Fields */
+  .field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+  .field label{font-size:12px;font-weight:600;color:var(--text);letter-spacing:0.03em;text-transform:uppercase;}
+  .input-wrap{position:relative;}
+  .input-wrap input{width:100%;padding:12px 44px 12px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:var(--off-white);outline:none;transition:all 0.2s;}
+  .input-wrap input:focus{border-color:var(--green);background:white;box-shadow:0 0 0 3px rgba(0,106,78,0.08);}
+  .input-wrap input.error{border-color:var(--error);}
+  .input-icon{position:absolute;right:13px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:16px;user-select:none;color:var(--text-muted);transition:color 0.2s;}
+  .input-icon:hover{color:var(--green);}
+
+  .field-footer{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+  .remember{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-muted);cursor:pointer;}
+  .remember input{accent-color:var(--green);}
+  .forgot-link{font-size:13px;color:var(--green);text-decoration:none;font-weight:500;}
+  .forgot-link:hover{text-decoration:underline;}
+
+  /* Login button */
+  .btn-login{width:100%;padding:14px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;background:var(--green);color:white;border:none;cursor:pointer;transition:all 0.2s;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:10px;}
+  .btn-login:hover{background:var(--green-light);transform:translateY(-1px);}
+  .btn-login:active{transform:translateY(0);}
+  .btn-login:disabled{opacity:0.65;cursor:not-allowed;transform:none;}
+  .btn-login.success-state{background:var(--success);}
+
+  .spinner{width:18px;height:18px;border:2.5px solid rgba(255,255,255,0.35);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;display:none;flex-shrink:0;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* Forgot password panel */
+  .forgot-panel{display:none;}
+  .forgot-panel.show{display:block;}
+  .login-panel{display:block;}
+  .login-panel.hide{display:none;}
+  .back-to-login{background:none;border:none;color:var(--green);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;padding:0;margin-bottom:20px;display:flex;align-items:center;gap:5px;}
+  .back-to-login:hover{text-decoration:underline;}
+
+  /* Divider */
+  .divider{display:flex;align-items:center;gap:12px;margin:20px 0;}
+  .divider-line{flex:1;height:1px;background:var(--border);}
+  .divider-text{font-size:12px;color:var(--text-muted);}
+
+  /* Social buttons */
+  .social-btns{display:flex;gap:10px;}
+  .social-btn{flex:1;padding:11px;border-radius:10px;border:1.5px solid var(--border);background:white;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s;}
+  .social-btn:hover{border-color:rgba(0,106,78,0.4);background:var(--green-pale);}
+  .social-icon{width:18px;height:18px;}
+
+  .register-prompt{margin-top:24px;padding-top:20px;border-top:1px solid var(--border);text-align:center;font-size:14px;color:var(--text-muted);}
+  .register-prompt a{color:var(--green);font-weight:600;text-decoration:none;}
+  .register-prompt a:hover{text-decoration:underline;}
+
+  /* Pending / banned notices */
+  .status-card{border-radius:12px;padding:18px 20px;margin-bottom:16px;display:none;}
+  .status-card.show{display:block;}
+  .status-card-pending{background:#FFF8E6;border:1px solid rgba(244,166,0,0.35);}
+  .status-card-banned{background:#FFF0F0;border:1px solid rgba(217,48,37,0.25);}
+  .sc-title{font-size:14px;font-weight:600;margin-bottom:4px;}
+  .sc-pending .sc-title{color:#8B6000;}
+  .sc-banned .sc-title{color:var(--error);}
+  .sc-body{font-size:13px;line-height:1.6;color:var(--text-muted);}
+
+  @media(max-width:800px){
+    .login-wrap{grid-template-columns:1fr;}
+    .login-left{display:none;}
+    .login-right{padding:32px 24px;border-left:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="login-wrap">
+
+  <!-- ── LEFT PANEL ── -->
+  <div class="login-left">
+    <div class="ll-bg"></div>
+    <div class="ll-pattern"></div>
+    <div class="ll-content">
+      <a href="index.html" class="ll-logo">
+        <div class="ll-logo-box">DPI</div>
+        <span class="ll-logo-text">DPI Society</span>
+      </a>
+      <h1 class="ll-title">Welcome<br>Back to<br><em>DPI Family</em></h1>
+      <p class="ll-sub">Log in to connect with your batchmates, access resources, and stay updated on events.</p>
+      <div class="testimonial">
+        <p class="testimonial-text">"DPI Society helped me reconnect with classmates I hadn't seen in over 10 years. The resource library is incredibly helpful for my current students."</p>
+        <div class="testimonial-author">
+          <div class="t-avatar">MR</div>
+          <div>
+            <div class="t-name">Mizanur Rahman</div>
+            <div class="t-batch">Civil Technology · Batch 63</div>
+          </div>
+        </div>
+      </div>
+      <div class="ll-dpi-tag">
+        <span>Official alumni network of</span>
+        <span class="ll-dpi-badge">ঢাকা পলিটেকনিক</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RIGHT PANEL ── -->
+  <div class="login-right">
+
+    <!-- ══ LOGIN PANEL ══ -->
+    <div class="login-panel" id="loginPanel">
+
+      <div class="lr-header">
+        <h1>Log In</h1>
+        <p>New to DPI Society? <a href="register.html">Create a free account →</a></p>
+      </div>
+
+      <!-- Role selector -->
+      <div class="role-label">Logging in as</div>
+      <div class="role-chips">
+        <div class="role-chip active" onclick="setRole(this,'member')">🎓 Alumni Member</div>
+        <div class="role-chip" onclick="setRole(this,'admin')">⚙️ Administrator</div>
+      </div>
+
+      <!-- Error banner -->
+      <div class="banner banner-error" id="errorBanner">
+        <span class="banner-icon">⚠️</span>
+        <span id="errorText">Invalid email or password.</span>
+      </div>
+
+      <!-- Email not verified -->
+      <div class="banner banner-warning" id="verifyBanner">
+        <span class="banner-icon">📧</span>
+        <span>Please verify your email first. Check your inbox for the confirmation link. <button onclick="resendVerification()" style="background:none;border:none;color:#8B6000;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px;text-decoration:underline;">Resend email</button></span>
+      </div>
+
+      <!-- Account pending -->
+      <div class="status-card status-card-pending sc-pending" id="pendingCard">
+        <div class="sc-title">⏳ Account Pending Approval</div>
+        <div class="sc-body">Your account has been created successfully but is awaiting admin approval. You'll receive an email once your account is activated. This usually takes 1–2 working days.</div>
+      </div>
+
+      <!-- Account banned -->
+      <div class="status-card status-card-banned sc-banned" id="bannedCard">
+        <div class="sc-title">🚫 Account Suspended</div>
+        <div class="sc-body">Your account has been suspended. Please contact the DPI Society admin team for assistance.</div>
+      </div>
+
+      <div class="field">
+        <label>Email Address</label>
+        <div class="input-wrap">
+          <input type="email" id="loginEmail" placeholder="your@email.com"
+            autocomplete="email"
+            onkeydown="if(event.key==='Enter')doLogin()"
+            oninput="clearErrors()">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <div class="input-wrap">
+          <input type="password" id="loginPassword" placeholder="Your password"
+            autocomplete="current-password"
+            onkeydown="if(event.key==='Enter')doLogin()"
+            oninput="clearErrors()">
+          <span class="input-icon" id="pwToggle" onclick="togglePw()">👁</span>
+        </div>
+      </div>
+
+      <div class="field-footer">
+        <label class="remember">
+          <input type="checkbox" id="rememberMe" checked>
+          Remember me
+        </label>
+        <button class="forgot-link" onclick="showForgot()" style="background:none;border:none;cursor:pointer;">Forgot password?</button>
+      </div>
+
+      <button class="btn-login" id="loginBtn" onclick="doLogin()">
+        <div class="spinner" id="loginSpinner"></div>
+        <span id="loginBtnText">Log In to DPI Society</span>
+      </button>
+
+      <div class="divider">
+        <div class="divider-line"></div>
+        <span class="divider-text">or continue with</span>
+        <div class="divider-line"></div>
+      </div>
+
+      <div class="social-btns">
+        <button class="social-btn" onclick="loginWithGoogle()">
+          <svg class="social-icon" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          Google
+        </button>
+        <button class="social-btn" onclick="loginWithFacebook()">
+          <svg class="social-icon" viewBox="0 0 24 24">
+            <path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+          Facebook
+        </button>
+      </div>
+
+      <div class="register-prompt">
+        Not yet a member? <a href="register.html">Join DPI Society for free →</a>
+      </div>
+    </div>
+
+    <!-- ══ FORGOT PASSWORD PANEL ══ -->
+    <div class="forgot-panel" id="forgotPanel">
+      <button class="back-to-login" onclick="showLogin()">← Back to Login</button>
+
+      <div class="lr-header">
+        <h1>Reset Password</h1>
+        <p style="font-size:14px;color:var(--text-muted);">Enter your email and we'll send you a reset link.</p>
+      </div>
+
+      <div class="banner banner-success" id="resetSuccessBanner">
+        <span class="banner-icon">✅</span>
+        <span>Password reset email sent! Check your inbox and follow the link to set a new password.</span>
+      </div>
+
+      <div class="banner banner-error" id="resetErrorBanner">
+        <span class="banner-icon">⚠️</span>
+        <span id="resetErrorText">Could not send reset email. Please try again.</span>
+      </div>
+
+      <div class="field">
+        <label>Email Address</label>
+        <div class="input-wrap">
+          <input type="email" id="resetEmail" placeholder="your@email.com" autocomplete="email"
+            onkeydown="if(event.key==='Enter')sendReset()">
+        </div>
+      </div>
+
+      <button class="btn-login" id="resetBtn" onclick="sendReset()">
+        <div class="spinner" id="resetSpinner"></div>
+        <span id="resetBtnText">Send Reset Link</span>
+      </button>
+    </div>
+
+  </div><!-- /login-right -->
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+let currentRole = 'member';
+let loginEmail  = '';   // saved for resend verification
+
+// ═══════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════
+function setRole(chip, role) {
+  document.querySelectorAll('.role-chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  currentRole = role;
+}
+
+function togglePw() {
+  const input  = document.getElementById('loginPassword');
+  const toggle = document.getElementById('pwToggle');
+  const isHidden = input.type === 'password';
+  input.type      = isHidden ? 'text'     : 'password';
+  toggle.textContent = isHidden ? '🙈' : '👁';
+}
+
+function showBanner(id) {
+  document.querySelectorAll('.banner').forEach(b => b.classList.remove('show'));
+  document.getElementById(id)?.classList.add('show');
+}
+
+function clearErrors() {
+  document.querySelectorAll('.banner').forEach(b => b.classList.remove('show'));
+  document.querySelectorAll('.status-card').forEach(c => c.classList.remove('show'));
+  document.getElementById('loginEmail').classList.remove('error');
+  document.getElementById('loginPassword').classList.remove('error');
+}
+
+function setLoginLoading(on, msg) {
+  const btn     = document.getElementById('loginBtn');
+  const spinner = document.getElementById('loginSpinner');
+  const text    = document.getElementById('loginBtnText');
+  btn.disabled       = on;
+  spinner.style.display = on ? 'block' : 'none';
+  if (msg) text.textContent = msg;
+}
+
+function showForgot() {
+  document.getElementById('loginPanel').classList.add('hide');
+  document.getElementById('forgotPanel').classList.add('show');
+  // Pre-fill forgot email if user already typed it
+  const typed = document.getElementById('loginEmail').value.trim();
+  if (typed) document.getElementById('resetEmail').value = typed;
+}
+
+function showLogin() {
+  document.getElementById('forgotPanel').classList.remove('show');
+  document.getElementById('loginPanel').classList.remove('hide');
+  document.getElementById('resetSuccessBanner').classList.remove('show');
+  document.getElementById('resetErrorBanner').classList.remove('show');
+}
+
+// ═══════════════════════════════════════════════
+//  MAIN LOGIN — REAL SUPABASE
+// ═══════════════════════════════════════════════
+async function doLogin() {
+  clearErrors();
+
+  const email    = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const password = document.getElementById('loginPassword').value;
+  const remember = document.getElementById('rememberMe').checked;
+
+  // ── Basic client-side validation ──
+  if (!email) {
+    document.getElementById('loginEmail').classList.add('error');
+    document.getElementById('errorText').textContent = 'Please enter your email address.';
+    showBanner('errorBanner');
+    return;
+  }
+  if (!password) {
+    document.getElementById('loginPassword').classList.add('error');
+    document.getElementById('errorText').textContent = 'Please enter your password.';
+    showBanner('errorBanner');
+    return;
+  }
+
+  loginEmail = email;
+  setLoginLoading(true, 'Logging in…');
+
+  try {
+    // ── 1. Sign in with Supabase Auth ──────────────────────
+    const { data: authData, error: authError } = await window.sb.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (authError) {
+      setLoginLoading(false, 'Log In to DPI Society');
+      const msg = authError.message.toLowerCase();
+
+      if (msg.includes('email not confirmed') || msg.includes('not confirmed')) {
+        showBanner('verifyBanner');
+        return;
+      }
+      if (msg.includes('invalid login') || msg.includes('invalid credentials') || msg.includes('wrong password')) {
+        document.getElementById('loginEmail').classList.add('error');
+        document.getElementById('loginPassword').classList.add('error');
+        document.getElementById('errorText').textContent = 'Incorrect email or password. Please try again.';
+        showBanner('errorBanner');
+        return;
+      }
+      if (msg.includes('too many requests')) {
+        document.getElementById('errorText').textContent = 'Too many login attempts. Please wait a few minutes and try again.';
+        showBanner('errorBanner');
+        return;
+      }
+      // Generic fallback
+      document.getElementById('errorText').textContent = authError.message;
+      showBanner('errorBanner');
+      return;
+    }
+
+    const userId = authData?.user?.id;
+    if (!userId) {
+      setLoginLoading(false, 'Log In to DPI Society');
+      document.getElementById('errorText').textContent = 'Login failed. Please try again.';
+      showBanner('errorBanner');
+      return;
+    }
+
+    // ── 2. Fetch profile to check account status ────────────
+    const { data: profile, error: profileError } = await window.sb
+      .from('profiles')
+      .select('status, user_type, full_name')
+      .eq('id', userId)
+      .single();
+
+    if (profileError || !profile) {
+      // Profile row doesn't exist yet — edge case, still allow login
+      console.warn('Profile fetch warning:', profileError?.message);
+    } else {
+      // ── 3. Check if account is approved ──────────────────
+      if (profile.status === 'pending') {
+        // Sign them out — they shouldn't get a session yet
+        await window.sb.auth.signOut();
+        setLoginLoading(false, 'Log In to DPI Society');
+        document.getElementById('pendingCard').classList.add('show');
+        return;
+      }
+
+      if (profile.status === 'banned') {
+        await window.sb.auth.signOut();
+        setLoginLoading(false, 'Log In to DPI Society');
+        document.getElementById('bannedCard').classList.add('show');
+        return;
+      }
+
+      // ── 4. Admin role check ────────────────────────────────
+      if (currentRole === 'admin' && profile.user_type !== 'admin') {
+        await window.sb.auth.signOut();
+        setLoginLoading(false, 'Log In to DPI Society');
+        document.getElementById('errorText').textContent = 'This account does not have administrator access.';
+        showBanner('errorBanner');
+        return;
+      }
+    }
+
+    // ── 5. Store session preference ────────────────────────
+    // Supabase handles sessions via localStorage by default.
+    // If "Remember me" is unchecked, we store a flag to clear on tab close.
+    if (!remember) {
+      sessionStorage.setItem('dpi_no_persist', '1');
+    } else {
+      sessionStorage.removeItem('dpi_no_persist');
+    }
+
+    // ── 6. Success — redirect ──────────────────────────────
+    const btn  = document.getElementById('loginBtn');
+    const text = document.getElementById('loginBtnText');
+    text.textContent = `✓ Welcome back${profile?.full_name ? ', ' + profile.full_name.split(' ')[0] : ''}!`;
+    btn.classList.add('success-state');
+    document.getElementById('loginSpinner').style.display = 'none';
+
+    setTimeout(() => {
+      // Redirect to admin panel if admin, else to homepage
+      // Check for a ?redirect= param first (e.g. from a protected page)
+      const params   = new URLSearchParams(window.location.search);
+      const redirect = params.get('redirect');
+      if (redirect) {
+        window.location.href = decodeURIComponent(redirect);
+      } else if (profile?.user_type === 'admin') {
+        window.location.href = 'admin.html';
+      } else {
+        window.location.href = 'index.html';
+      }
+    }, 900);
+
+  } catch (err) {
+    setLoginLoading(false, 'Log In to DPI Society');
+    console.error('Unexpected login error:', err);
+    document.getElementById('errorText').textContent = 'An unexpected error occurred. Check your internet connection.';
+    showBanner('errorBanner');
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  FORGOT PASSWORD — REAL SUPABASE
+// ═══════════════════════════════════════════════
+async function sendReset() {
+  document.getElementById('resetSuccessBanner').classList.remove('show');
+  document.getElementById('resetErrorBanner').classList.remove('show');
+
+  const email = document.getElementById('resetEmail').value.trim().toLowerCase();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    document.getElementById('resetErrorText').textContent = 'Please enter a valid email address.';
+    document.getElementById('resetErrorBanner').classList.add('show');
+    return;
+  }
+
+  const btn     = document.getElementById('resetBtn');
+  const spinner = document.getElementById('resetSpinner');
+  const text    = document.getElementById('resetBtnText');
+  btn.disabled        = true;
+  spinner.style.display = 'block';
+  text.textContent    = 'Sending…';
+
+  try {
+    const { error } = await window.sb.auth.resetPasswordForEmail(email, {
+      // redirectTo: 'https://yourdomain.com/reset-password.html'  ← uncomment after deploying
+    });
+
+    spinner.style.display = 'none';
+    btn.disabled = false;
+    text.textContent = 'Send Reset Link';
+
+    if (error) {
+      document.getElementById('resetErrorText').textContent = error.message;
+      document.getElementById('resetErrorBanner').classList.add('show');
+      return;
+    }
+
+    // Always show success — Supabase doesn't reveal if email exists (security)
+    document.getElementById('resetSuccessBanner').classList.add('show');
+    document.getElementById('resetEmail').value = '';
+
+  } catch (err) {
+    spinner.style.display = 'none';
+    btn.disabled = false;
+    text.textContent = 'Send Reset Link';
+    document.getElementById('resetErrorText').textContent = 'Could not send reset email. Please try again.';
+    document.getElementById('resetErrorBanner').classList.add('show');
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  RESEND EMAIL VERIFICATION
+// ═══════════════════════════════════════════════
+async function resendVerification() {
+  if (!loginEmail) return;
+  try {
+    await window.sb.auth.resend({ type: 'signup', email: loginEmail });
+    document.getElementById('verifyBanner').querySelector('span:last-child').innerHTML =
+      'Verification email resent to <strong>' + loginEmail + '</strong>. Check your inbox.';
+  } catch (e) {
+    console.warn('Resend failed:', e);
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  SOCIAL LOGIN
+// ═══════════════════════════════════════════════
+async function loginWithGoogle() {
+  try {
+    const { error } = await window.sb.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        // redirectTo: 'https://yourdomain.com/index.html'  ← uncomment after deploying
+      }
+    });
+    if (error) {
+      document.getElementById('errorText').textContent = 'Google login failed. Please try email login.';
+      showBanner('errorBanner');
+    }
+  } catch (e) {
+    document.getElementById('errorText').textContent = 'Google login is not configured yet.';
+    showBanner('errorBanner');
+  }
+}
+
+async function loginWithFacebook() {
+  try {
+    const { error } = await window.sb.auth.signInWithOAuth({
+      provider: 'facebook',
+      options: {
+        // redirectTo: 'https://yourdomain.com/index.html'
+      }
+    });
+    if (error) {
+      document.getElementById('errorText').textContent = 'Facebook login failed. Please try email login.';
+      showBanner('errorBanner');
+    }
+  } catch (e) {
+    document.getElementById('errorText').textContent = 'Facebook login is not configured yet.';
+    showBanner('errorBanner');
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  SESSION CHECK — REDIRECT IF ALREADY LOGGED IN
+// ═══════════════════════════════════════════════
+window.addEventListener('load', async () => {
+  try {
+    const { data: { session } } = await window.sb.auth.getSession();
+    if (session) {
+      // Already logged in — check profile and redirect
+      const { data: profile } = await window.sb
+        .from('profiles')
+        .select('user_type, status')
+        .eq('id', session.user.id)
+        .single();
+
+      if (profile?.status === 'pending') {
+        // Stay on page — show pending notice
+        await window.sb.auth.signOut();
+        document.getElementById('pendingCard').classList.add('show');
+        return;
+      }
+
+      if (profile?.user_type === 'admin') {
+        window.location.href = 'admin.html';
+      } else {
+        window.location.href = 'index.html';
+      }
+    }
+  } catch (e) {
+    // Supabase credentials not set yet — show the form normally
+  }
+});
+
+// ── Clear session if "no persist" flag set (remember me = off) ──
+window.addEventListener('beforeunload', () => {
+  if (sessionStorage.getItem('dpi_no_persist')) {
+    window.sb?.auth.signOut();
+  }
+});
+</script>
+<div id="dpiToast"></div>
+</body>
+</html>
